@@ -290,7 +290,7 @@ function TopHeader({ userTier, setUserTier, onMenuClick }) {
           <Menu size={24} />
         </button>
         <span style={{ color: colors.textMuted, fontSize: '13px' }}>Institution:</span>
-        <span style={{ fontWeight: '600' }}>University of California</span>
+        <span style={{ fontWeight: '600' }}>University of California San Diego</span>
       </div>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -336,8 +336,8 @@ function TopHeader({ userTier, setUserTier, onMenuClick }) {
             JD
           </div>
           <div>
-            <div style={{ fontSize: '13px', fontWeight: '500' }}>Dr. Jane Doe</div>
-            <div style={{ fontSize: '11px', color: colors.textMuted }}>Research Faculty</div>
+            <div style={{ fontSize: '13px', fontWeight: '500' }}>Dr. Candice Chow</div>
+            <div style={{ fontSize: '11px', color: colors.textMuted }}>Assistant Professor</div>
           </div>
         </div>
       </div>
