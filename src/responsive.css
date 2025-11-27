@@ -48,6 +48,12 @@
   .chat-panel {
     width: 340px !important;
   }
+
+  /* Dashboard stats - 2 columns on smaller laptops */
+  div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"],
+  div[style*="grid-template-columns: repeat(4, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
 }
 
 /* Medium laptops (1200px and below) - hide chat by default */
@@ -126,6 +132,12 @@
   /* Chat panel stays hidden/slide-out */
   .chat-panel {
     width: 350px !important;
+  }
+
+  /* Dashboard charts - stack vertically */
+  div[style*="gridTemplateColumns: '2fr 1fr'"],
+  div[style*="grid-template-columns: 2fr 1fr"] {
+    grid-template-columns: 1fr !important;
   }
 }
 
@@ -419,8 +431,23 @@
 
   div[style*="grid-template-columns: 2fr 1fr"],
   div[style*="grid-template-columns: 1fr 2fr"],
-  div[style*="grid-template-columns: 3fr 1fr"] {
+  div[style*="grid-template-columns: 3fr 1fr"],
+  div[style*="gridTemplateColumns: '2fr 1fr'"],
+  div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] {
     grid-template-columns: 1fr !important;
+  }
+
+  /* Dashboard stats - single column on mobile */
+  div[style*="grid-template-columns: repeat(4"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Table wrapper for horizontal scroll */
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
   }
 
   /* Panels and cards - full width */

@@ -23,7 +23,7 @@ const colors = {
 // Main App Component
 export default function PEARApp() {
   const [currentView, setCurrentView] = useState('canvas');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // Start collapsed
   const [userTier, setUserTier] = useState('A3'); // A1, A2, A3
 
   // Mobile panel states
@@ -290,7 +290,7 @@ function TopHeader({ userTier, setUserTier, onMenuClick }) {
           <Menu size={24} />
         </button>
         <span style={{ color: colors.textMuted, fontSize: '13px' }}>Institution:</span>
-        <span style={{ fontWeight: '600' }}>University of California</span>
+        <span style={{ fontWeight: '600' }}>University of Toronto</span>
       </div>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -1199,7 +1199,7 @@ function ResearchCompanion() {
           <div style={{ fontSize: '12px', color: colors.textMuted, marginBottom: '12px', fontWeight: '600' }}>
             DATABASES
           </div>
-          {['JSTOR', 'PubMed', 'IEEE Xplore', 'UC Press', 'PLOS', 'Nature'].map((db, idx) => (
+          {['JSTOR', 'PubMed', 'IEEE Xplore', 'Google Scholar', 'Scopus'].map((db, idx) => (
             <label key={idx} style={{
               display: 'flex',
               alignItems: 'center',
@@ -1327,87 +1327,211 @@ function CitationManager() {
 // Admin Dashboard Component
 function AdminDashboard() {
   const stats = [
-    { label: 'Total Users', value: '12,847', change: '+12%', icon: Users },
-    { label: 'Documents Created', value: '45,231', change: '+8%', icon: FileText },
-    { label: 'AI Queries', value: '128,459', change: '+23%', icon: Sparkles },
-    { label: 'Citations Added', value: '89,120', change: '+15%', icon: Quote },
+    { label: 'Total Users', value: '12,847', change: '+12%', icon: Users, color: colors.accent },
+    { label: 'Active Sessions', value: '3,241', change: '+8%', icon: Activity, color: colors.success },
+    { label: 'Documents Created', value: '45,892', change: '+23%', icon: FileText, color: colors.info },
+    { label: 'Integrity Flags', value: '127', change: '-5%', icon: Flag, color: colors.warning },
   ];
 
   return (
-    <div style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
-      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '24px' }}>Analytics Dashboard</h2>
-        
-        {/* Stats Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '16px',
-          marginBottom: '24px',
-        }}>
-          {stats.map((stat, idx) => (
-            <div key={idx} style={{
-              padding: '20px',
-              borderRadius: '12px',
-              backgroundColor: colors.bgSecondary,
-              border: `1px solid ${colors.border}`,
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                <stat.icon size={20} color={colors.accent} />
-                <span style={{
-                  fontSize: '12px',
-                  color: colors.success,
-                  fontWeight: '600',
-                }}>{stat.change}</span>
+    <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+      <div style={{ marginBottom: '24px' }}>
+        <h2 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '4px' }}>Analytics Dashboard</h2>
+        <p style={{ color: colors.textMuted }}>Monitor PEAR usage across your institution</p>
+      </div>
+
+      {/* Stats Grid */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        gap: '16px',
+        marginBottom: '24px',
+      }}>
+        {stats.map((stat, idx) => (
+          <div key={idx} style={{
+            padding: '24px',
+            borderRadius: '16px',
+            backgroundColor: colors.bgSecondary,
+            border: `1px solid ${colors.border}`,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div style={{
+                padding: '12px',
+                borderRadius: '12px',
+                backgroundColor: stat.color + '20',
+              }}>
+                <stat.icon size={24} color={stat.color} />
               </div>
-              <div style={{ fontSize: '24px', fontWeight: '700', marginBottom: '4px' }}>{stat.value}</div>
-              <div style={{ fontSize: '13px', color: colors.textMuted }}>{stat.label}</div>
+              <span style={{
+                padding: '4px 10px',
+                borderRadius: '20px',
+                backgroundColor: stat.change.startsWith('+') ? colors.success + '20' : colors.danger + '20',
+                color: stat.change.startsWith('+') ? colors.success : colors.danger,
+                fontSize: '12px',
+                fontWeight: '600',
+              }}>
+                {stat.change}
+              </span>
             </div>
-          ))}
+            <div style={{ fontSize: '32px', fontWeight: '700', marginBottom: '4px' }}>{stat.value}</div>
+            <div style={{ fontSize: '14px', color: colors.textMuted }}>{stat.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Charts Row */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '2fr 1fr',
+        gap: '16px',
+        marginBottom: '24px',
+      }}>
+        {/* Usage Chart */}
+        <div style={{
+          padding: '24px',
+          borderRadius: '16px',
+          backgroundColor: colors.bgSecondary,
+          border: `1px solid ${colors.border}`,
+        }}>
+          <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '20px' }}>Platform Usage Over Time</h3>
+          <div style={{
+            height: '200px',
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'space-between',
+            gap: '8px',
+            paddingTop: '20px',
+          }}>
+            {[65, 78, 82, 75, 90, 85, 95, 88, 92, 98, 94, 100].map((height, idx) => (
+              <div
+                key={idx}
+                style={{
+                  flex: 1,
+                  height: `${height}%`,
+                  backgroundColor: colors.accent,
+                  borderRadius: '4px 4px 0 0',
+                  opacity: 0.7 + (idx * 0.025),
+                }}
+              />
+            ))}
+          </div>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginTop: '12px',
+            fontSize: '11px',
+            color: colors.textMuted,
+          }}>
+            {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map(month => (
+              <span key={month}>{month}</span>
+            ))}
+          </div>
         </div>
 
-        {/* Charts Placeholder */}
+        {/* User Distribution */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: '2fr 1fr',
-          gap: '16px',
+          padding: '24px',
+          borderRadius: '16px',
+          backgroundColor: colors.bgSecondary,
+          border: `1px solid ${colors.border}`,
         }}>
-          <div style={{
-            padding: '20px',
-            borderRadius: '12px',
-            backgroundColor: colors.bgSecondary,
-            border: `1px solid ${colors.border}`,
-            minHeight: '300px',
-          }}>
-            <h3 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px' }}>Usage Over Time</h3>
-            <div style={{
-              height: '240px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: colors.textMuted,
-            }}>
-              <LineChart size={48} />
-            </div>
-          </div>
-          <div style={{
-            padding: '20px',
-            borderRadius: '12px',
-            backgroundColor: colors.bgSecondary,
-            border: `1px solid ${colors.border}`,
-          }}>
-            <h3 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px' }}>User Distribution</h3>
-            <div style={{
-              height: '240px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: colors.textMuted,
-            }}>
-              <PieChart size={48} />
-            </div>
+          <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '20px' }}>User Distribution</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {[
+              { tier: 'A1 - Core', count: '9,234', percent: 72, color: colors.accent },
+              { tier: 'A2 - Premium', count: '2,891', percent: 22, color: colors.info },
+              { tier: 'A3 - Signature', count: '722', percent: 6, color: colors.warning },
+            ].map((item, idx) => (
+              <div key={idx}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                  <span style={{ fontSize: '13px' }}>{item.tier}</span>
+                  <span style={{ fontSize: '13px', color: colors.textMuted }}>{item.count}</span>
+                </div>
+                <div style={{
+                  height: '8px',
+                  backgroundColor: colors.bgTertiary,
+                  borderRadius: '4px',
+                  overflow: 'hidden',
+                }}>
+                  <div style={{
+                    width: `${item.percent}%`,
+                    height: '100%',
+                    backgroundColor: item.color,
+                    borderRadius: '4px',
+                  }} />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
+      </div>
+
+      {/* Recent Activity */}
+      <div style={{
+        padding: '24px',
+        borderRadius: '16px',
+        backgroundColor: colors.bgSecondary,
+        border: `1px solid ${colors.border}`,
+      }}>
+        <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '20px' }}>Recent Activity Log</h3>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              {['User', 'Action', 'Resource', 'Timestamp', 'Status'].map(header => (
+                <th key={header} style={{
+                  padding: '12px',
+                  textAlign: 'left',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  color: colors.textMuted,
+                  borderBottom: `1px solid ${colors.border}`,
+                }}>
+                  {header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              { user: 'john.smith@utoronto.ca', action: 'Document Created', resource: 'Research Paper Draft', time: '2 mins ago', status: 'success' },
+              { user: 'sarah.jones@utoronto.ca', action: 'Integrity Check', resource: 'Final Thesis.docx', time: '15 mins ago', status: 'warning' },
+              { user: 'mike.chen@utoronto.ca', action: 'Export Citations', resource: 'Bibliography.bib', time: '32 mins ago', status: 'success' },
+              { user: 'emily.davis@utoronto.ca', action: 'AI Query', resource: 'Research Companion', time: '1 hour ago', status: 'success' },
+              { user: 'prof.wilson@utoronto.ca', action: 'Plagiarism Review', resource: 'Student Submission', time: '2 hours ago', status: 'flagged' },
+            ].map((row, idx) => (
+              <tr key={idx}>
+                <td style={{ padding: '14px 12px', fontSize: '13px', borderBottom: `1px solid ${colors.border}` }}>
+                  {row.user}
+                </td>
+                <td style={{ padding: '14px 12px', fontSize: '13px', borderBottom: `1px solid ${colors.border}` }}>
+                  {row.action}
+                </td>
+                <td style={{ padding: '14px 12px', fontSize: '13px', borderBottom: `1px solid ${colors.border}`, color: colors.accent }}>
+                  {row.resource}
+                </td>
+                <td style={{ padding: '14px 12px', fontSize: '13px', borderBottom: `1px solid ${colors.border}`, color: colors.textMuted }}>
+                  {row.time}
+                </td>
+                <td style={{ padding: '14px 12px', borderBottom: `1px solid ${colors.border}` }}>
+                  <span style={{
+                    padding: '4px 10px',
+                    borderRadius: '20px',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    backgroundColor: 
+                      row.status === 'success' ? colors.success + '20' :
+                      row.status === 'warning' ? colors.warning + '20' : colors.danger + '20',
+                    color:
+                      row.status === 'success' ? colors.success :
+                      row.status === 'warning' ? colors.warning : colors.danger,
+                  }}>
+                    {row.status === 'success' ? 'Completed' : row.status === 'warning' ? 'Review' : 'Flagged'}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
