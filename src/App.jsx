@@ -332,11 +332,11 @@ function TopHeader({ userTier, setUserTier, onMenuClick }) {
             fontSize: '14px',
             fontWeight: '600',
           }}>
-            CC
+            KW
           </div>
           <div>
-            <div style={{ fontSize: '13px', fontWeight: '500' }}>Dr. Candice Chow</div>
-            <div style={{ fontSize: '11px', color: colors.textMuted }}>Assistant Professor</div>
+            <div style={{ fontSize: '13px', fontWeight: '500' }}>Dr. Keiwan Wind</div>
+            <div style={{ fontSize: '11px', color: colors.textMuted }}>Assistant Professor (Phd.)</div>
           </div>
         </div>
       </div>
