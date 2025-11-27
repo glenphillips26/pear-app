@@ -290,7 +290,7 @@ function TopHeader({ userTier, setUserTier, onMenuClick }) {
           <Menu size={24} />
         </button>
         <span style={{ color: colors.textMuted, fontSize: '13px' }}>Institution:</span>
-        <span style={{ fontWeight: '600' }}>University of Toronto</span>
+        <span style={{ fontWeight: '600' }}>University of California</span>
       </div>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -1155,13 +1155,66 @@ function PresentationEditor() {
 function ResearchCompanion() {
   const [searchQuery, setSearchQuery] = useState('');
 
+  const samplePapers = [
+    {
+      id: 1,
+      title: 'Machine Learning Approaches for Climate Change Prediction Models',
+      authors: 'Chen, L., Rodriguez, M., & Park, S.',
+      year: 2024,
+      journal: 'Nature Climate Change',
+      database: 'JSTOR',
+      citations: 142,
+      abstract: 'This study presents novel machine learning methodologies for improving climate prediction accuracy...',
+    },
+    {
+      id: 2,
+      title: 'CRISPR-Cas9 Applications in Treating Genetic Disorders: A Systematic Review',
+      authors: 'Williams, A., Thompson, K., & Lee, J.',
+      year: 2024,
+      journal: 'Cell Therapy',
+      database: 'PubMed',
+      citations: 89,
+      abstract: 'A comprehensive review of recent advances in CRISPR-based therapeutic interventions...',
+    },
+    {
+      id: 3,
+      title: 'Quantum Computing Algorithms for Cryptographic Security',
+      authors: 'Nakamura, H. & Okonkwo, E.',
+      year: 2023,
+      journal: 'IEEE Transactions on Quantum Engineering',
+      database: 'IEEE Xplore',
+      citations: 67,
+      abstract: 'We propose a new class of quantum-resistant cryptographic protocols...',
+    },
+    {
+      id: 4,
+      title: 'The Impact of Social Media on Democratic Participation',
+      authors: 'Garcia, R., Smith, T., & Johnson, M.',
+      year: 2024,
+      journal: 'Journal of Communication',
+      database: 'UC Press',
+      citations: 234,
+      abstract: 'An empirical analysis of social media influence on voter engagement and political discourse...',
+    },
+    {
+      id: 5,
+      title: 'Microbiome Diversity and Its Role in Autoimmune Disease Prevention',
+      authors: 'Patel, S., Kim, Y., & Anderson, B.',
+      year: 2023,
+      journal: 'PLOS Medicine',
+      database: 'PLOS',
+      citations: 156,
+      abstract: 'This longitudinal study examines the relationship between gut microbiome composition...',
+    },
+  ];
+
   return (
     <div className="research-layout" style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
       {/* Search Panel */}
       <div 
         className="research-sidebar"
         style={{
-        width: '400px',
+        width: '300px',
         borderRight: `1px solid ${colors.border}`,
         display: 'flex',
         flexDirection: 'column',
@@ -1202,7 +1255,7 @@ function ResearchCompanion() {
           <div style={{ fontSize: '12px', color: colors.textMuted, marginBottom: '12px', fontWeight: '600' }}>
             DATABASES
           </div>
-          {['JSTOR', 'PubMed', 'IEEE Xplore', 'Google Scholar', 'Scopus'].map((db, idx) => (
+          {['JSTOR', 'PubMed', 'IEEE Xplore', 'UC Press', 'PLOS'].map((db, idx) => (
             <label key={idx} style={{
               display: 'flex',
               alignItems: 'center',
@@ -1215,15 +1268,143 @@ function ResearchCompanion() {
             </label>
           ))}
         </div>
+
+        {/* Search Tips */}
+        <div style={{ padding: '0 20px 20px', marginTop: 'auto' }}>
+          <div style={{
+            padding: '16px',
+            borderRadius: '10px',
+            backgroundColor: colors.bgTertiary,
+            border: `1px solid ${colors.border}`,
+          }}>
+            <div style={{ fontSize: '12px', fontWeight: '600', marginBottom: '8px', color: colors.accent }}>
+              Search Tips
+            </div>
+            <p style={{ fontSize: '11px', color: colors.textMuted, lineHeight: '1.5' }}>
+              Use quotes for exact phrases. Add AND, OR, NOT for boolean searches.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Results Area */}
       <div className="research-results" style={{ flex: 1, padding: '20px', overflowY: 'auto' }}>
-        <div style={{ marginBottom: '20px' }}>
-          <span style={{ color: colors.textMuted, fontSize: '13px' }}>
-            Enter a search query to find peer-reviewed academic sources
-          </span>
+        <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <span style={{ fontSize: '14px', fontWeight: '600' }}>Recent Papers</span>
+            <span style={{ color: colors.textMuted, fontSize: '13px', marginLeft: '8px' }}>
+              {samplePapers.length} results
+            </span>
+          </div>
+          <select style={{
+            backgroundColor: colors.bgTertiary,
+            border: `1px solid ${colors.border}`,
+            borderRadius: '6px',
+            padding: '6px 10px',
+            color: colors.textPrimary,
+            fontSize: '12px',
+          }}>
+            <option>Sort by Relevance</option>
+            <option>Sort by Date</option>
+            <option>Sort by Citations</option>
+          </select>
         </div>
+
+        {/* Paper Cards */}
+        {samplePapers.map((paper) => (
+          <div key={paper.id} style={{
+            padding: '20px',
+            marginBottom: '12px',
+            borderRadius: '12px',
+            backgroundColor: colors.bgSecondary,
+            border: `1px solid ${colors.border}`,
+            transition: 'border-color 0.2s ease',
+            cursor: 'pointer',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+              <div style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '10px',
+                backgroundColor: colors.bgTertiary,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}>
+                <FileText size={20} color={colors.accent} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <h3 style={{ 
+                  fontSize: '14px', 
+                  fontWeight: '600', 
+                  marginBottom: '6px',
+                  lineHeight: '1.4',
+                  color: colors.textPrimary,
+                }}>
+                  {paper.title}
+                </h3>
+                <p style={{ fontSize: '12px', color: colors.textMuted, marginBottom: '8px' }}>
+                  {paper.authors} • {paper.year}
+                </p>
+                <p style={{ 
+                  fontSize: '12px', 
+                  color: colors.textSecondary, 
+                  lineHeight: '1.5',
+                  marginBottom: '12px',
+                }}>
+                  {paper.abstract}
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                  <span style={{
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    backgroundColor: colors.accent + '20',
+                    color: colors.accent,
+                    fontSize: '11px',
+                    fontWeight: '600',
+                  }}>
+                    {paper.database}
+                  </span>
+                  <span style={{ fontSize: '11px', color: colors.textMuted }}>
+                    {paper.journal}
+                  </span>
+                  <span style={{ fontSize: '11px', color: colors.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Quote size={12} />
+                    {paper.citations} citations
+                  </span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <button style={{
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  backgroundColor: colors.accent,
+                  color: '#fff',
+                  fontSize: '11px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}>
+                  Add to Cite
+                </button>
+                <button style={{
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  border: `1px solid ${colors.border}`,
+                  backgroundColor: 'transparent',
+                  color: colors.textSecondary,
+                  fontSize: '11px',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}>
+                  View PDF
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -1496,11 +1677,11 @@ function AdminDashboard() {
           </thead>
           <tbody>
             {[
-              { user: 'john.smith@utoronto.ca', action: 'Document Created', resource: 'Research Paper Draft', time: '2 mins ago', status: 'success' },
-              { user: 'sarah.jones@utoronto.ca', action: 'Integrity Check', resource: 'Final Thesis.docx', time: '15 mins ago', status: 'warning' },
-              { user: 'mike.chen@utoronto.ca', action: 'Export Citations', resource: 'Bibliography.bib', time: '32 mins ago', status: 'success' },
-              { user: 'emily.davis@utoronto.ca', action: 'AI Query', resource: 'Research Companion', time: '1 hour ago', status: 'success' },
-              { user: 'prof.wilson@utoronto.ca', action: 'Plagiarism Review', resource: 'Student Submission', time: '2 hours ago', status: 'flagged' },
+              { user: 'john.smith@berkeley.edu', action: 'Document Created', resource: 'Research Paper Draft', time: '2 mins ago', status: 'success' },
+              { user: 'sarah.jones@berkeley.edu', action: 'Integrity Check', resource: 'Final Thesis.docx', time: '15 mins ago', status: 'warning' },
+              { user: 'mike.chen@berkeley.edu', action: 'Export Citations', resource: 'Bibliography.bib', time: '32 mins ago', status: 'success' },
+              { user: 'emily.davis@berkeley.edu', action: 'AI Query', resource: 'Research Companion', time: '1 hour ago', status: 'success' },
+              { user: 'prof.wilson@berkeley.edu', action: 'Plagiarism Review', resource: 'Student Submission', time: '2 hours ago', status: 'flagged' },
             ].map((row, idx) => (
               <tr key={idx}>
                 <td style={{ padding: '14px 12px', fontSize: '13px', borderBottom: `1px solid ${colors.border}` }}>

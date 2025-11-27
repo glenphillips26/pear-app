@@ -49,6 +49,11 @@
     width: 340px !important;
   }
 
+  /* Research sidebar */
+  .research-sidebar {
+    width: 280px !important;
+  }
+
   /* Dashboard stats - 2 columns on smaller laptops */
   div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"],
   div[style*="grid-template-columns: repeat(4, 1fr)"] {
@@ -296,6 +301,22 @@
   }
 
   .research-results {
+    flex: 1;
+    padding: 16px !important;
+  }
+
+  /* Research paper cards - stack buttons below */
+  .research-results > div > div {
+    flex-direction: column !important;
+  }
+
+  .research-results > div > div > div:last-child {
+    flex-direction: row !important;
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  .research-results > div > div > div:last-child button {
     flex: 1;
   }
 
