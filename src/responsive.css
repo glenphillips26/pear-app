@@ -13,6 +13,29 @@
   .app-root > div:last-child {
     padding: 0;
   }
+
+  /* Canvas toolbar - make narrower on tablet */
+  .canvas-toolbar {
+    width: 220px !important;
+  }
+
+  /* Chat panel - narrower on tablet */
+  .chat-panel {
+    width: 320px !important;
+  }
+}
+
+/* Medium tablets (900px and below) - hide workspace tools */
+@media screen and (max-width: 900px) {
+  /* Hide the workspace tools panel on medium tablets */
+  .canvas-toolbar {
+    display: none !important;
+  }
+
+  /* Chat panel can be a bit wider */
+  .chat-panel {
+    width: 350px !important;
+  }
 }
 
 /* Mobile devices (768px and below) */
@@ -99,6 +122,48 @@
     padding: 6px 8px !important;
   }
 
+  /* ==========================================
+     CANVAS LAYOUT - Critical mobile fixes
+     ========================================== */
+  
+  /* Canvas layout container - stack vertically */
+  .canvas-layout {
+    flex-direction: column !important;
+  }
+
+  /* HIDE the Workspace Tools panel (right toolbar) on mobile */
+  .canvas-toolbar {
+    display: none !important;
+  }
+
+  /* Chat panel - make it collapsible/smaller on mobile */
+  .chat-panel {
+    width: 100% !important;
+    max-height: 40vh !important;
+    min-height: 200px;
+    border-right: none !important;
+    border-bottom: 1px solid #333434;
+    flex-shrink: 0;
+  }
+
+  /* Workspace panel takes remaining space */
+  .workspace-panel {
+    flex: 1 !important;
+    min-height: 50vh;
+  }
+
+  /* Document wrapper - reduce padding on mobile */
+  .doc-wrapper {
+    padding: 16px !important;
+  }
+
+  /* Document page - make it fit mobile screens */
+  .doc-page {
+    padding: 24px !important;
+    min-height: auto !important;
+    max-width: 100% !important;
+  }
+
   /* Stack grid layouts */
   div[style*="grid-template-columns: 1fr 1fr"] {
     grid-template-columns: 1fr !important;
@@ -118,7 +183,8 @@
   /* Panels and cards - full width */
   div[style*="width: '320px'"],
   div[style*="width: '280px'"],
-  div[style*="width: '300px'"] {
+  div[style*="width: '300px'"],
+  div[style*="width: '400px'"] {
     width: 100% !important;
     min-width: 100% !important;
   }
@@ -135,9 +201,10 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Text editor toolbar - wrap */
+  /* Text editor toolbar - wrap and make compact */
   div[style*="display: 'flex'"][style*="gap: '4px'"] {
     flex-wrap: wrap;
+    padding: 8px 12px !important;
   }
 
   /* Modal/Dialog adjustments */
@@ -146,6 +213,20 @@
     max-width: 95% !important;
     max-height: 90vh !important;
     margin: 5vh auto;
+  }
+
+  /* Tab bar - make scrollable horizontally */
+  .canvas-layout > div:first-child > div:first-child {
+    overflow-x: auto;
+    padding: 8px 12px !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Tab buttons - more compact */
+  .canvas-layout > div:first-child > div:first-child button {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    white-space: nowrap;
   }
 }
 
@@ -209,6 +290,51 @@
   /* Main content with smaller bottom padding */
   .app-root > div:last-child {
     padding-bottom: 70px;
+  }
+
+  /* ==========================================
+     CANVAS LAYOUT - Small mobile optimizations
+     ========================================== */
+
+  /* Chat panel - even smaller on tiny screens */
+  .chat-panel {
+    max-height: 35vh !important;
+    min-height: 180px;
+  }
+
+  /* Chat header - more compact */
+  .chat-panel > div:first-child {
+    padding: 10px 12px !important;
+  }
+
+  /* Chat input area - compact */
+  .chat-panel > div:last-child {
+    padding: 10px !important;
+  }
+
+  /* Document page - minimal padding */
+  .doc-page {
+    padding: 16px !important;
+  }
+
+  /* Document wrapper */
+  .doc-wrapper {
+    padding: 8px !important;
+  }
+
+  /* Hide "Academic Sources Only" badge on tiny screens */
+  .chat-panel > div:first-child > span:last-child {
+    display: none !important;
+  }
+
+  /* Formatting toolbar - hide some buttons */
+  .workspace-panel > div > div:first-child {
+    padding: 8px !important;
+  }
+
+  /* Tab labels - hide on tiny screens, show only icons */
+  .canvas-layout > div:first-child > div:first-child button span {
+    display: none !important;
   }
 }
 
