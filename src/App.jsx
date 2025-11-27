@@ -148,15 +148,15 @@ function NavigationSidebar({ currentView, setCurrentView, collapsed, setCollapse
         padding: '10px',
         borderBottom: `1px solid ${colors.border}`,
         display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
+        alignItems: 'left',
+        gap: '5px',
       }}>
         <img 
   src="/pear-logo.png"
   alt="PEAR Logo"
   style={{
-    width: '80px',
-    height: '80px',
+    width: '70px',
+    height: '70px',
     objectFit: 'contain',
     flexShrink: 0,
   }}
