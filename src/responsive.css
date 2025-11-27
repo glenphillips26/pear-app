@@ -228,6 +228,78 @@
   }
 
   /* ==========================================
+     TOP HEADER - Fix overlapping elements
+     ========================================== */
+  
+  /* Hide tier selector and user profile on mobile */
+  .app-root > div:last-child > div:first-child > div:last-child {
+    display: none !important;
+  }
+
+  /* Show only hamburger and institution on mobile header */
+  .app-root > div:last-child > div:first-child {
+    padding: 0 12px !important;
+    height: 50px !important;
+    justify-content: flex-start !important;
+  }
+
+  /* Hide "Institution:" label text */
+  .app-root > div:last-child > div:first-child > div:first-child > span:first-child {
+    display: none !important;
+  }
+
+  /* ==========================================
+     CITATION MANAGER - Fix layout
+     ========================================== */
+  
+  .page-header {
+    flex-wrap: wrap;
+  }
+
+  .page-actions {
+    width: 100%;
+  }
+
+  .page-actions button {
+    flex: 1;
+    justify-content: center;
+  }
+
+  /* Page container padding */
+  .page-container {
+    padding: 16px !important;
+  }
+
+  /* ==========================================
+     GOVERNANCE CONTROLS - Stack cards
+     ========================================== */
+  
+  .governance-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ==========================================
+     RESEARCH COMPANION - Collapsible sidebar
+     ========================================== */
+  
+  .research-layout {
+    flex-direction: column !important;
+  }
+
+  .research-sidebar {
+    width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid #333434;
+    max-height: none !important;
+    position: relative !important;
+    transform: none !important;
+  }
+
+  .research-results {
+    flex: 1;
+  }
+
+  /* ==========================================
      LEFT SIDEBAR - Slide from left
      ========================================== */
   
@@ -505,7 +577,7 @@
   /* Even more compact header */
   .app-root > div:last-child > div:first-child {
     padding: 0 8px !important;
-    justify-content: space-between;
+    justify-content: flex-start !important;
   }
 
   /* Hide tier selector labels, show just tier code */
@@ -533,9 +605,9 @@
     padding: 12px !important;
   }
 
-  /* Stack stat cards */
+  /* Stack stat cards - single column on tiny screens */
   div[style*="grid-template-columns: repeat(4"] {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: 1fr !important;
   }
 
   /* Full-width inputs */
@@ -614,6 +686,25 @@
   /* Tab labels - hide on tiny screens, show only icons */
   .canvas-layout > div:first-child > div:first-child button span {
     display: none !important;
+  }
+
+  /* Page containers - compact padding */
+  .page-container {
+    padding: 12px !important;
+  }
+
+  /* Page headers - smaller text */
+  .page-header h2 {
+    font-size: 18px !important;
+  }
+
+  /* Page actions - stack vertically */
+  .page-actions {
+    flex-direction: column !important;
+  }
+
+  .page-actions button {
+    width: 100% !important;
   }
 }
 

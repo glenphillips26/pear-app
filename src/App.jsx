@@ -1156,14 +1156,17 @@ function ResearchCompanion() {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+    <div className="research-layout" style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
       {/* Search Panel */}
-      <div style={{
+      <div 
+        className="research-sidebar"
+        style={{
         width: '400px',
         borderRight: `1px solid ${colors.border}`,
         display: 'flex',
         flexDirection: 'column',
         backgroundColor: colors.bgSecondary,
+        flexShrink: 0,
       }}>
         <div style={{ padding: '20px' }}>
           <h2 style={{ fontSize: '18px', marginBottom: '16px', fontWeight: '600' }}>Research Companion</h2>
@@ -1215,7 +1218,7 @@ function ResearchCompanion() {
       </div>
 
       {/* Results Area */}
-      <div style={{ flex: 1, padding: '20px', overflowY: 'auto' }}>
+      <div className="research-results" style={{ flex: 1, padding: '20px', overflowY: 'auto' }}>
         <div style={{ marginBottom: '20px' }}>
           <span style={{ color: colors.textMuted, fontSize: '13px' }}>
             Enter a search query to find peer-reviewed academic sources
@@ -1235,11 +1238,11 @@ function CitationManager() {
   ];
 
   return (
-    <div style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
+    <div className="page-container" style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+        <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
           <h2 style={{ fontSize: '20px', fontWeight: '600' }}>Citation Manager</h2>
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div className="page-actions" style={{ display: 'flex', gap: '12px' }}>
             <button style={{
               padding: '10px 16px',
               borderRadius: '8px',
@@ -1334,8 +1337,8 @@ function AdminDashboard() {
   ];
 
   return (
-    <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
-      <div style={{ marginBottom: '24px' }}>
+    <div className="page-container" style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+      <div className="page-header" style={{ marginBottom: '24px' }}>
         <h2 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '4px' }}>Analytics Dashboard</h2>
         <p style={{ color: colors.textMuted }}>Monitor PEAR usage across your institution</p>
       </div>
@@ -1540,15 +1543,17 @@ function AdminDashboard() {
 // Governance Controls Component
 function GovernanceControls() {
   return (
-    <div style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
+    <div className="page-container" style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>Governance Controls</h2>
-        <p style={{ color: colors.textMuted, marginBottom: '24px' }}>
-          Manage institutional AI policies and academic integrity settings
-        </p>
+        <div className="page-header" style={{ marginBottom: '24px' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>Governance Controls</h2>
+          <p style={{ color: colors.textMuted }}>
+            Manage institutional AI policies and academic integrity settings
+          </p>
+        </div>
 
         {/* Policy Cards */}
-        <div style={{
+        <div className="governance-grid" style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
           gap: '16px',
