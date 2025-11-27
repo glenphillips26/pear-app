@@ -1,0 +1,45 @@
+/* ========= GLOBAL LAYOUT ========= */
+
+@media (max-width: 768px) {
+  /* App root: stack vertically instead of left/right */
+  .app-root {
+    flex-direction: column !important;
+  }
+
+  /* Sidebar: make it full-width on top */
+  .app-sidebar {
+    width: 100% !important;
+    flex-direction: row !important;
+    height: auto !important;
+  }
+
+  /* Hide the right-side toolbar on small screens */
+  .canvas-toolbar {
+    display: none !important;
+  }
+
+  /* Main canvas: stack chat above workspace */
+  .canvas-layout {
+    flex-direction: column !important;
+  }
+
+  .chat-panel {
+    width: 100% !important;
+    max-height: 40vh;
+  }
+
+  .workspace-panel {
+    width: 100% !important;
+  }
+
+  /* Document page: reduce padding / width on phones */
+  .doc-wrapper {
+    padding: 16px !important;
+  }
+
+  .doc-page {
+    max-width: 100% !important;
+    padding: 24px !important;
+    min-height: auto !important;
+  }
+}

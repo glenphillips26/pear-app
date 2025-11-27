@@ -27,7 +27,9 @@ export default function PEARApp() {
   const [userTier, setUserTier] = useState('A3'); // A1, A2, A3
 
   return (
-    <div style={{
+    <div 
+      className="app-root"
+      style={{
       minHeight: '100vh',
       backgroundColor: colors.bgPrimary,
       color: colors.textPrimary,
@@ -71,7 +73,9 @@ function NavigationSidebar({ currentView, setCurrentView, collapsed, setCollapse
   const accessibleTiers = tierAccess[userTier] || ['A1'];
 
   return (
-    <div style={{
+    <div
+      className="app-sidebar" 
+      style={{
       width: collapsed ? '70px' : '240px',
       backgroundColor: colors.bgSecondary,
       borderRight: `1px solid ${colors.border}`,
@@ -277,7 +281,7 @@ function PEARCanvas({ userTier }) {
   };
 
   return (
-    <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+    <div className="canvas-layout" style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
       {/* Main Canvas Area */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Tab Bar */}
@@ -333,7 +337,9 @@ function PEARCanvas({ userTier }) {
         {/* Canvas Content */}
         <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
           {/* AI Chat Panel */}
-          <div style={{
+          <div 
+            className="chat-panel"
+            style={{
             width: '400px',
             borderRight: `1px solid ${colors.border}`,
             display: 'flex',
@@ -486,7 +492,9 @@ function PEARCanvas({ userTier }) {
           </div>
 
           {/* Document/Workspace Area */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: colors.bgPrimary }}>
+          <div 
+            className="workspace-panel"
+            style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: colors.bgPrimary }}>
             {activeTab === 'document' && <DocumentEditor />}
             {activeTab === 'spreadsheet' && <SpreadsheetEditor />}
             {activeTab === 'presentation' && <PresentationEditor />}
@@ -516,7 +524,9 @@ function CanvasToolbar({ activeTab, setActiveTab }) {
   ];
 
   return (
-    <div style={{
+    <div
+      className="canvas-toolbar" 
+      style={{
       width: '280px',
       backgroundColor: colors.bgSecondary,
       borderLeft: `1px solid ${colors.border}`,
@@ -721,14 +731,18 @@ function DocumentEditor() {
       </div>
 
       {/* Document Area */}
-      <div style={{
+      <div 
+        className="doc-wrapper"
+        style={{
         flex: 1,
         padding: '40px',
         overflowY: 'auto',
         display: 'flex',
         justifyContent: 'center',
       }}>
-        <div style={{
+        <div
+          className="doc-page" 
+          style={{
           width: '100%',
           maxWidth: '816px',
           minHeight: '1056px',
