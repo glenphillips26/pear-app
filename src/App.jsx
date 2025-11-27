@@ -155,8 +155,8 @@ function NavigationSidebar({ currentView, setCurrentView, collapsed, setCollapse
   src="/pear-logo.png"
   alt="PEAR Logo"
   style={{
-    width: '44px',
-    height: '44px',
+    width: '50px',
+    height: '50px',
     objectFit: 'contain',
     flexShrink: 0,
   }}
