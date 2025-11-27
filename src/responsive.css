@@ -1,45 +1,296 @@
-/* ========= GLOBAL LAYOUT ========= */
+/* =============================================
+   PEAR App - Responsive Styles
+   ============================================= */
 
-@media (max-width: 768px) {
-  /* App root: stack vertically instead of left/right */
+/* Tablet and below (1024px) */
+@media screen and (max-width: 1024px) {
+  /* Collapse sidebar by default */
+  .app-sidebar {
+    width: 70px !important;
+  }
+
+  /* Reduce padding in content areas */
+  .app-root > div:last-child {
+    padding: 0;
+  }
+}
+
+/* Mobile devices (768px and below) */
+@media screen and (max-width: 768px) {
+  /* Main app layout - stack vertically */
   .app-root {
     flex-direction: column !important;
   }
 
-  /* Sidebar: make it full-width on top */
+  /* Hide sidebar on mobile - convert to bottom nav or hamburger */
   .app-sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     width: 100% !important;
+    height: 70px !important;
     flex-direction: row !important;
-    height: auto !important;
+    border-right: none !important;
+    border-top: 1px solid #333434;
+    z-index: 1000;
+    justify-content: space-around;
+    padding: 0 !important;
   }
 
-  /* Hide the right-side toolbar on small screens */
-  .canvas-toolbar {
+  /* Hide logo section on mobile */
+  .app-sidebar > div:first-child {
     display: none !important;
   }
 
-  /* Main canvas: stack chat above workspace */
-  .canvas-layout {
+  /* Make nav horizontal on mobile */
+  .app-sidebar nav {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    padding: 8px !important;
+    flex: 1;
+  }
+
+  /* Nav buttons in mobile */
+  .app-sidebar nav button {
+    flex-direction: column !important;
+    gap: 4px !important;
+    padding: 8px !important;
+    margin: 0 !important;
+    font-size: 10px !important;
+    min-width: 60px;
+  }
+
+  /* Hide collapse toggle on mobile */
+  .app-sidebar > button:last-child {
+    display: none !important;
+  }
+
+  /* Hide nav labels on mobile - show only icons */
+  .app-sidebar nav button span {
+    display: none !important;
+  }
+
+  /* Main content adjustments */
+  .app-root > div:last-child {
+    padding-bottom: 80px; /* Space for bottom nav */
+    width: 100%;
+  }
+
+  /* Top header adjustments */
+  .app-root > div:last-child > div:first-child {
+    padding: 0 12px !important;
+    height: 50px !important;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Hide institution label on small screens */
+  .app-root > div:last-child > div:first-child > div:first-child span:first-child {
+    display: none;
+  }
+
+  /* Tier selector - make compact */
+  .app-root select {
+    font-size: 12px !important;
+    padding: 6px 8px !important;
+  }
+
+  /* Stack grid layouts */
+  div[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  div[style*="grid-template-columns: 2fr 1fr"],
+  div[style*="grid-template-columns: 1fr 2fr"],
+  div[style*="grid-template-columns: 3fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Canvas main area */
+  div[style*="display: 'flex'"][style*="flex: 1"] {
     flex-direction: column !important;
   }
 
-  .chat-panel {
+  /* Panels and cards - full width */
+  div[style*="width: '320px'"],
+  div[style*="width: '280px'"],
+  div[style*="width: '300px'"] {
     width: 100% !important;
-    max-height: 40vh;
+    min-width: 100% !important;
   }
 
-  .workspace-panel {
-    width: 100% !important;
+  /* Reduce border radius for mobile */
+  div[style*="borderRadius: '16px'"],
+  div[style*="borderRadius: '12px'"] {
+    border-radius: 8px !important;
   }
 
-  /* Document page: reduce padding / width on phones */
-  .doc-wrapper {
+  /* Scrollable content areas */
+  div[style*="overflow: 'auto'"],
+  div[style*="overflow-y: 'auto'"] {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Text editor toolbar - wrap */
+  div[style*="display: 'flex'"][style*="gap: '4px'"] {
+    flex-wrap: wrap;
+  }
+
+  /* Modal/Dialog adjustments */
+  div[style*="position: 'fixed'"][style*="inset: '0'"] > div {
+    width: 95% !important;
+    max-width: 95% !important;
+    max-height: 90vh !important;
+    margin: 5vh auto;
+  }
+}
+
+/* Small mobile devices (480px and below) */
+@media screen and (max-width: 480px) {
+  /* Even more compact header */
+  .app-root > div:last-child > div:first-child {
+    padding: 0 8px !important;
+    justify-content: center;
+  }
+
+  /* Hide tier selector labels, show just tier code */
+  .app-root select option {
+    font-size: 11px;
+  }
+
+  /* Smaller fonts overall */
+  body {
+    font-size: 14px;
+  }
+
+  /* Compact buttons */
+  button {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+  }
+
+  /* Reduce spacing in cards */
+  div[style*="padding: '24px'"] {
     padding: 16px !important;
   }
 
-  .doc-page {
-    max-width: 100% !important;
-    padding: 24px !important;
-    min-height: auto !important;
+  div[style*="padding: '20px'"] {
+    padding: 12px !important;
+  }
+
+  /* Stack stat cards */
+  div[style*="grid-template-columns: repeat(4"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Full-width inputs */
+  input[type="text"],
+  input[type="search"],
+  textarea,
+  select {
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  /* Bottom nav - smaller */
+  .app-sidebar {
+    height: 60px !important;
+  }
+
+  .app-sidebar nav button {
+    min-width: 50px;
+    padding: 6px !important;
+  }
+
+  /* Main content with smaller bottom padding */
+  .app-root > div:last-child {
+    padding-bottom: 70px;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger tap targets */
+  button,
+  a,
+  select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Better spacing for touch */
+  nav button {
+    margin: 4px !important;
+  }
+
+  /* Disable hover effects on touch */
+  button:hover {
+    background-color: inherit;
+  }
+}
+
+/* Landscape mobile adjustments */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  .app-sidebar {
+    width: 70px !important;
+    height: 100% !important;
+    flex-direction: column !important;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+  }
+
+  .app-sidebar nav {
+    flex-direction: column !important;
+  }
+
+  .app-root > div:last-child {
+    margin-left: 70px;
+    padding-bottom: 0;
+  }
+}
+
+/* High DPI / Retina adjustments */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Thinner borders for retina */
+  div[style*="border:"] {
+    border-width: 0.5px !important;
+  }
+}
+
+/* Dark mode preference (if user prefers) */
+@media (prefers-color-scheme: dark) {
+  /* Already dark theme - no changes needed */
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .app-sidebar {
+    display: none !important;
+  }
+
+  .app-root > div:last-child > div:first-child {
+    display: none !important;
+  }
+
+  .app-root {
+    display: block !important;
+  }
+
+  button {
+    display: none !important;
   }
 }
