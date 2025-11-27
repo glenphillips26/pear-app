@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Search, FileText, Table, Presentation, BookOpen, Quote, PenTool, Shield, BarChart3, Users, Eye, AlertTriangle, CheckCircle, Clock, Download, Filter, ChevronDown, Plus, X, Send, Sparkles, GraduationCap, Settings, LogOut, Menu, Home, Layers, FileSpreadsheet, SlidersHorizontal, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Image, Save, Undo, Redo, Type, PieChart, LineChart, BarChart2, TrendingUp, Calendar, Activity, Lock, Unlock, Flag, ExternalLink, Copy, Trash2, MoreVertical, ChevronRight, Database, Globe, Bookmark, Zap } from 'lucide-react';
+import { Search, FileText, Table, Presentation, BookOpen, Quote, PenTool, Shield, BarChart3, Users, Eye, AlertTriangle, CheckCircle, Clock, Download, Filter, ChevronDown, Plus, X, Send, Sparkles, GraduationCap, Settings, LogOut, Menu, Home, Layers, FileSpreadsheet, SlidersHorizontal, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Image, Save, Undo, Redo, Type, PieChart, LineChart, BarChart2, TrendingUp, Calendar, Activity, Lock, Unlock, Flag, ExternalLink, Copy, Trash2, MoreVertical, ChevronRight, Database, Globe, Bookmark, Zap, MessageCircle } from 'lucide-react';
 
 // Perplexity-inspired color palette
 const colors = {
@@ -26,6 +26,18 @@ export default function PEARApp() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [userTier, setUserTier] = useState('A3'); // A1, A2, A3
 
+  // Mobile panel states
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [toolbarOpen, setToolbarOpen] = useState(false);
+
+  // Close all panels (for overlay click)
+  const closeAllPanels = () => {
+    setSidebarOpen(false);
+    setChatOpen(false);
+    setToolbarOpen(false);
+  };
+
   return (
     <div 
       className="app-root"
@@ -36,20 +48,67 @@ export default function PEARApp() {
       fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif",
       display: 'flex',
     }}>
+      {/* Overlay for mobile panels */}
+      <div 
+        className={`panel-overlay ${(sidebarOpen || chatOpen || toolbarOpen) ? 'visible' : ''}`}
+        onClick={closeAllPanels}
+      />
+
+      {/* Mobile Toggle Buttons */}
+      <div className="mobile-toggles">
+        <button 
+          className={`mobile-toggle-btn ${chatOpen ? 'active' : ''}`}
+          onClick={() => { 
+            setChatOpen(!chatOpen); 
+            setToolbarOpen(false); 
+          }}
+          title="AI Assistant"
+        >
+          <MessageCircle size={20} />
+        </button>
+        <button 
+          className={`mobile-toggle-btn ${toolbarOpen ? 'active' : ''}`}
+          onClick={() => { 
+            setToolbarOpen(!toolbarOpen); 
+            setChatOpen(false); 
+          }}
+          title="Workspace Tools"
+        >
+          <Layers size={20} />
+        </button>
+      </div>
+
       {/* Left Navigation Sidebar */}
       <NavigationSidebar 
         currentView={currentView} 
-        setCurrentView={setCurrentView}
+        setCurrentView={(view) => {
+          setCurrentView(view);
+          setSidebarOpen(false); // Close sidebar on mobile after selection
+        }}
         collapsed={sidebarCollapsed}
         setCollapsed={setSidebarCollapsed}
         userTier={userTier}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
       
       {/* Main Content Area */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <TopHeader userTier={userTier} setUserTier={setUserTier} />
+        <TopHeader 
+          userTier={userTier} 
+          setUserTier={setUserTier}
+          onMenuClick={() => setSidebarOpen(!sidebarOpen)}
+        />
         
-        {currentView === 'canvas' && <PEARCanvas userTier={userTier} />}
+        {currentView === 'canvas' && (
+          <PEARCanvas 
+            userTier={userTier}
+            chatOpen={chatOpen}
+            setChatOpen={setChatOpen}
+            toolbarOpen={toolbarOpen}
+            setToolbarOpen={setToolbarOpen}
+          />
+        )}
         {currentView === 'research' && <ResearchCompanion />}
         {currentView === 'citations' && <CitationManager />}
         {currentView === 'dashboard' && <AdminDashboard />}
@@ -60,7 +119,7 @@ export default function PEARApp() {
 }
 
 // Navigation Sidebar
-function NavigationSidebar({ currentView, setCurrentView, collapsed, setCollapsed, userTier }) {
+function NavigationSidebar({ currentView, setCurrentView, collapsed, setCollapsed, userTier, isOpen, onClose }) {
   const navItems = [
     { id: 'canvas', icon: Layers, label: 'PEAR Canvas', tier: 'A1' },
     { id: 'research', icon: BookOpen, label: 'Research Companion', tier: 'A1' },
@@ -74,7 +133,7 @@ function NavigationSidebar({ currentView, setCurrentView, collapsed, setCollapse
 
   return (
     <div
-      className="app-sidebar" 
+      className={`app-sidebar ${isOpen ? 'open' : ''}`}
       style={{
       width: collapsed ? '70px' : '240px',
       backgroundColor: colors.bgSecondary,
@@ -110,6 +169,23 @@ function NavigationSidebar({ currentView, setCurrentView, collapsed, setCollapse
             <div style={{ fontSize: '10px', color: colors.textMuted, letterSpacing: '1px' }}>BY PERPLEXITY</div>
           </div>
         )}
+        {/* Mobile close button */}
+        <button
+          className="close-btn"
+          onClick={onClose}
+          style={{
+            marginLeft: 'auto',
+            padding: '8px',
+            borderRadius: '8px',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: colors.textSecondary,
+            cursor: 'pointer',
+            display: 'none', // Hidden by default, shown via CSS on mobile
+          }}
+        >
+          <X size={20} />
+        </button>
       </div>
 
       {/* Navigation Items */}
@@ -185,7 +261,7 @@ function NavigationSidebar({ currentView, setCurrentView, collapsed, setCollapse
 }
 
 // Top Header
-function TopHeader({ userTier, setUserTier }) {
+function TopHeader({ userTier, setUserTier, onMenuClick }) {
   return (
     <div style={{
       height: '60px',
@@ -197,6 +273,22 @@ function TopHeader({ userTier, setUserTier }) {
       padding: '0 24px',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        {/* Hamburger menu for mobile */}
+        <button
+          className="header-menu-btn"
+          onClick={onMenuClick}
+          style={{
+            padding: '8px',
+            borderRadius: '8px',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: colors.textSecondary,
+            cursor: 'pointer',
+            display: 'none', // Hidden by default, shown via CSS on mobile
+          }}
+        >
+          <Menu size={24} />
+        </button>
         <span style={{ color: colors.textMuted, fontSize: '13px' }}>Institution:</span>
         <span style={{ fontWeight: '600' }}>University of Toronto</span>
       </div>
@@ -254,7 +346,7 @@ function TopHeader({ userTier, setUserTier }) {
 }
 
 // PEAR Canvas - Main Workspace
-function PEARCanvas({ userTier }) {
+function PEARCanvas({ userTier, chatOpen, setChatOpen, toolbarOpen, setToolbarOpen }) {
   const [activeTab, setActiveTab] = useState('document');
   const [query, setQuery] = useState('');
   const [messages, setMessages] = useState([]);
@@ -317,7 +409,7 @@ function PEARCanvas({ userTier }) {
               }}
             >
               <tab.icon size={16} />
-              {tab.label}
+              <span>{tab.label}</span>
             </button>
           ))}
           
@@ -338,7 +430,7 @@ function PEARCanvas({ userTier }) {
         <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
           {/* AI Chat Panel */}
           <div 
-            className="chat-panel"
+            className={`chat-panel ${chatOpen ? 'open' : ''}`}
             style={{
             width: '400px',
             borderRight: `1px solid ${colors.border}`,
@@ -367,6 +459,22 @@ function PEARCanvas({ userTier }) {
               }}>
                 Academic Sources Only
               </span>
+              {/* Mobile close button */}
+              <button
+                className="close-btn"
+                onClick={() => setChatOpen(false)}
+                style={{
+                  padding: '4px',
+                  borderRadius: '4px',
+                  border: 'none',
+                  backgroundColor: 'transparent',
+                  color: colors.textMuted,
+                  cursor: 'pointer',
+                  display: 'none', // Hidden by default, shown via CSS
+                }}
+              >
+                <X size={18} />
+              </button>
             </div>
 
             {/* Messages */}
@@ -503,13 +611,18 @@ function PEARCanvas({ userTier }) {
       </div>
 
       {/* Right Toolbar */}
-      <CanvasToolbar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <CanvasToolbar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab}
+        isOpen={toolbarOpen}
+        onClose={() => setToolbarOpen(false)}
+      />
     </div>
   );
 }
 
 // Right Toolbar for Canvas
-function CanvasToolbar({ activeTab, setActiveTab }) {
+function CanvasToolbar({ activeTab, setActiveTab, isOpen, onClose }) {
   const tools = [
     { id: 'document', icon: FileText, label: 'Word Processing', desc: 'Create documents with AI assistance' },
     { id: 'spreadsheet', icon: FileSpreadsheet, label: 'Data Analysis', desc: 'Analyze CSV/Excel data' },
@@ -525,7 +638,7 @@ function CanvasToolbar({ activeTab, setActiveTab }) {
 
   return (
     <div
-      className="canvas-toolbar" 
+      className={`canvas-toolbar ${isOpen ? 'open' : ''}`}
       style={{
       width: '280px',
       backgroundColor: colors.bgSecondary,
@@ -538,9 +651,30 @@ function CanvasToolbar({ activeTab, setActiveTab }) {
       <div style={{
         padding: '16px 20px',
         borderBottom: `1px solid ${colors.border}`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
       }}>
-        <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>Workspace Tools</h3>
-        <p style={{ fontSize: '12px', color: colors.textMuted }}>All-in-one academic workspace</p>
+        <div>
+          <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>Workspace Tools</h3>
+          <p style={{ fontSize: '12px', color: colors.textMuted }}>All-in-one academic workspace</p>
+        </div>
+        {/* Mobile close button */}
+        <button
+          className="close-btn"
+          onClick={onClose}
+          style={{
+            padding: '8px',
+            borderRadius: '8px',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: colors.textSecondary,
+            cursor: 'pointer',
+            display: 'none', // Hidden by default, shown via CSS
+          }}
+        >
+          <X size={20} />
+        </button>
       </div>
 
       {/* Main Tools */}
@@ -775,6 +909,40 @@ Use the AI assistant on the left to research topics and automatically insert cit
   );
 }
 
+// Toolbar Button Component
+function ToolbarButton({ icon: Icon, tooltip, accent }) {
+  return (
+    <button
+      title={tooltip}
+      style={{
+        padding: '8px',
+        borderRadius: '4px',
+        border: 'none',
+        backgroundColor: 'transparent',
+        color: accent ? colors.accent : colors.textSecondary,
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Icon size={16} />
+    </button>
+  );
+}
+
+// Toolbar Divider Component
+function ToolbarDivider() {
+  return (
+    <div style={{
+      width: '1px',
+      height: '20px',
+      backgroundColor: colors.border,
+      margin: '0 8px',
+    }} />
+  );
+}
+
 // Spreadsheet Editor Component
 function SpreadsheetEditor() {
   const sampleData = [
@@ -798,7 +966,7 @@ function SpreadsheetEditor() {
         backgroundColor: colors.bgSecondary,
       }}>
         <button style={{
-          padding: '8px 14px',
+          padding: '8px 16px',
           borderRadius: '6px',
           border: `1px solid ${colors.border}`,
           backgroundColor: colors.bgTertiary,
@@ -813,7 +981,22 @@ function SpreadsheetEditor() {
           Import CSV
         </button>
         <button style={{
-          padding: '8px 14px',
+          padding: '8px 16px',
+          borderRadius: '6px',
+          border: `1px solid ${colors.border}`,
+          backgroundColor: colors.bgTertiary,
+          color: colors.textPrimary,
+          fontSize: '12px',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+        }}>
+          <Sparkles size={14} color={colors.accent} />
+          AI Analysis
+        </button>
+        <button style={{
+          padding: '8px 16px',
           borderRadius: '6px',
           border: `1px solid ${colors.border}`,
           backgroundColor: colors.bgTertiary,
@@ -825,137 +1008,48 @@ function SpreadsheetEditor() {
           gap: '6px',
         }}>
           <BarChart2 size={14} />
-          Create Chart
+          Visualize
         </button>
-        <button style={{
-          padding: '8px 14px',
-          borderRadius: '6px',
-          border: `1px solid ${colors.border}`,
-          backgroundColor: colors.bgTertiary,
-          color: colors.textPrimary,
-          fontSize: '12px',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-        }}>
-          <TrendingUp size={14} />
-          Run Analysis
-        </button>
-        <button style={{
-          padding: '8px 14px',
-          borderRadius: '6px',
-          border: 'none',
-          backgroundColor: colors.accent,
-          color: '#fff',
-          fontSize: '12px',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-        }}>
-          <Sparkles size={14} />
-          AI Analysis
-        </button>
-        
-        <div style={{ marginLeft: 'auto' }}>
-          <input
-            type="text"
-            placeholder="fx  =SUM(B2:B6)"
-            style={{
-              padding: '8px 12px',
-              borderRadius: '6px',
-              border: `1px solid ${colors.border}`,
-              backgroundColor: colors.bgTertiary,
-              color: colors.textPrimary,
-              fontSize: '12px',
-              width: '200px',
-            }}
-          />
-        </div>
       </div>
 
-      {/* Spreadsheet Grid */}
+      {/* Spreadsheet Area */}
       <div style={{ flex: 1, overflow: 'auto', padding: '20px' }}>
         <table style={{
           width: '100%',
           borderCollapse: 'collapse',
-          fontSize: '13px',
+          backgroundColor: colors.bgSecondary,
+          borderRadius: '8px',
+          overflow: 'hidden',
         }}>
           <thead>
             <tr>
-              <th style={{
-                width: '40px',
-                padding: '10px',
-                backgroundColor: colors.bgTertiary,
-                border: `1px solid ${colors.border}`,
-                color: colors.textMuted,
-              }}></th>
-              {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].map(col => (
-                <th key={col} style={{
-                  padding: '10px 20px',
+              {sampleData[0].map((header, idx) => (
+                <th key={idx} style={{
+                  padding: '12px 16px',
+                  textAlign: 'left',
                   backgroundColor: colors.bgTertiary,
-                  border: `1px solid ${colors.border}`,
-                  color: colors.textSecondary,
+                  color: colors.textPrimary,
                   fontWeight: '600',
-                  minWidth: '100px',
+                  fontSize: '12px',
+                  borderBottom: `1px solid ${colors.border}`,
                 }}>
-                  {col}
+                  {header}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {sampleData.map((row, rowIdx) => (
+            {sampleData.slice(1).map((row, rowIdx) => (
               <tr key={rowIdx}>
-                <td style={{
-                  padding: '10px',
-                  backgroundColor: colors.bgTertiary,
-                  border: `1px solid ${colors.border}`,
-                  color: colors.textMuted,
-                  textAlign: 'center',
-                  fontWeight: '600',
-                }}>
-                  {rowIdx + 1}
-                </td>
                 {row.map((cell, cellIdx) => (
                   <td key={cellIdx} style={{
-                    padding: '10px 12px',
-                    backgroundColor: rowIdx === 0 ? colors.bgTertiary : colors.bgSecondary,
-                    border: `1px solid ${colors.border}`,
-                    fontWeight: rowIdx === 0 ? '600' : '400',
-                    color: rowIdx === 0 ? colors.accent : colors.textPrimary,
+                    padding: '10px 16px',
+                    fontSize: '13px',
+                    borderBottom: `1px solid ${colors.border}`,
+                    color: colors.textSecondary,
                   }}>
                     {cell}
                   </td>
-                ))}
-                {[...Array(8 - row.length)].map((_, idx) => (
-                  <td key={`empty-${idx}`} style={{
-                    padding: '10px 12px',
-                    backgroundColor: colors.bgSecondary,
-                    border: `1px solid ${colors.border}`,
-                  }}></td>
-                ))}
-              </tr>
-            ))}
-            {[...Array(15)].map((_, rowIdx) => (
-              <tr key={`empty-row-${rowIdx}`}>
-                <td style={{
-                  padding: '10px',
-                  backgroundColor: colors.bgTertiary,
-                  border: `1px solid ${colors.border}`,
-                  color: colors.textMuted,
-                  textAlign: 'center',
-                  fontWeight: '600',
-                }}>
-                  {sampleData.length + rowIdx + 1}
-                </td>
-                {[...Array(8)].map((_, cellIdx) => (
-                  <td key={`empty-cell-${cellIdx}`} style={{
-                    padding: '10px 12px',
-                    backgroundColor: colors.bgSecondary,
-                    border: `1px solid ${colors.border}`,
-                  }}></td>
                 ))}
               </tr>
             ))}
@@ -968,13 +1062,6 @@ function SpreadsheetEditor() {
 
 // Presentation Editor Component
 function PresentationEditor() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const slides = [
-    { title: 'Research Presentation', subtitle: 'Using PEAR Academic Platform', layout: 'title' },
-    { title: 'Introduction', content: 'Overview of research methodology and objectives', layout: 'content' },
-    { title: 'Key Findings', content: 'Data analysis results with citations', layout: 'content' },
-  ];
-
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
       {/* Presentation Toolbar */}
@@ -987,7 +1074,7 @@ function PresentationEditor() {
         backgroundColor: colors.bgSecondary,
       }}>
         <button style={{
-          padding: '8px 14px',
+          padding: '8px 16px',
           borderRadius: '6px',
           border: `1px solid ${colors.border}`,
           backgroundColor: colors.bgTertiary,
@@ -1002,7 +1089,7 @@ function PresentationEditor() {
           New Slide
         </button>
         <button style={{
-          padding: '8px 14px',
+          padding: '8px 16px',
           borderRadius: '6px',
           border: `1px solid ${colors.border}`,
           backgroundColor: colors.bgTertiary,
@@ -1013,303 +1100,127 @@ function PresentationEditor() {
           alignItems: 'center',
           gap: '6px',
         }}>
-          <Layers size={14} />
-          Layouts
+          <Sparkles size={14} color={colors.accent} />
+          AI Generate
         </button>
-        <button style={{
-          padding: '8px 14px',
-          borderRadius: '6px',
-          border: `1px solid ${colors.border}`,
-          backgroundColor: colors.bgTertiary,
-          color: colors.textPrimary,
-          fontSize: '12px',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-        }}>
-          <Image size={14} />
-          Insert
-        </button>
-        <button style={{
-          padding: '8px 14px',
-          borderRadius: '6px',
-          border: 'none',
-          backgroundColor: colors.accent,
-          color: '#fff',
-          fontSize: '12px',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-        }}>
-          <Sparkles size={14} />
-          AI Generate Slides
-        </button>
-        
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
-          <button style={{
-            padding: '8px 14px',
-            borderRadius: '6px',
-            border: `1px solid ${colors.border}`,
-            backgroundColor: colors.bgTertiary,
-            color: colors.textPrimary,
-            fontSize: '12px',
-            cursor: 'pointer',
-          }}>
-            Present
-          </button>
-        </div>
       </div>
 
       {/* Presentation Area */}
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+      <div style={{ flex: 1, display: 'flex', padding: '20px', gap: '20px' }}>
         {/* Slide Thumbnails */}
         <div style={{
-          width: '180px',
-          backgroundColor: colors.bgTertiary,
-          borderRight: `1px solid ${colors.border}`,
-          padding: '16px',
-          overflowY: 'auto',
+          width: '120px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
         }}>
-          {slides.map((slide, idx) => (
-            <div
-              key={idx}
-              onClick={() => setCurrentSlide(idx)}
-              style={{
-                aspectRatio: '16/9',
-                marginBottom: '12px',
-                borderRadius: '6px',
-                border: currentSlide === idx ? `2px solid ${colors.accent}` : `1px solid ${colors.border}`,
-                backgroundColor: '#fff',
-                cursor: 'pointer',
-                padding: '8px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <div style={{ fontSize: '6px', fontWeight: '600', color: '#333', textAlign: 'center' }}>
-                {slide.title}
-              </div>
+          {[1, 2, 3].map(num => (
+            <div key={num} style={{
+              aspectRatio: '16/9',
+              backgroundColor: num === 1 ? colors.bgTertiary : colors.bgSecondary,
+              borderRadius: '6px',
+              border: num === 1 ? `2px solid ${colors.accent}` : `1px solid ${colors.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '12px',
+              color: colors.textMuted,
+              cursor: 'pointer',
+            }}>
+              {num}
             </div>
           ))}
-          <button style={{
-            width: '100%',
-            aspectRatio: '16/9',
-            borderRadius: '6px',
-            border: `2px dashed ${colors.border}`,
-            backgroundColor: 'transparent',
-            color: colors.textMuted,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-            <Plus size={20} />
-          </button>
         </div>
 
-        {/* Main Slide View */}
+        {/* Main Slide */}
         <div style={{
           flex: 1,
+          backgroundColor: '#fff',
+          borderRadius: '8px',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           padding: '40px',
-          backgroundColor: colors.bgPrimary,
         }}>
-          <div style={{
-            width: '100%',
-            maxWidth: '900px',
-            aspectRatio: '16/9',
-            backgroundColor: '#fff',
-            borderRadius: '8px',
-            boxShadow: '0 4px 30px rgba(0,0,0,0.4)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: '60px',
-          }}>
-            {slides[currentSlide]?.layout === 'title' ? (
-              <>
-                <h1 style={{ fontSize: '42px', fontWeight: '700', color: '#1a1a1a', marginBottom: '16px' }}>
-                  {slides[currentSlide]?.title}
-                </h1>
-                <p style={{ fontSize: '24px', color: '#666' }}>
-                  {slides[currentSlide]?.subtitle}
-                </p>
-              </>
-            ) : (
-              <>
-                <h2 style={{ fontSize: '32px', fontWeight: '600', color: '#1a1a1a', marginBottom: '24px', alignSelf: 'flex-start' }}>
-                  {slides[currentSlide]?.title}
-                </h2>
-                <p style={{ fontSize: '18px', color: '#444', lineHeight: '1.6', alignSelf: 'flex-start' }}>
-                  {slides[currentSlide]?.content}
-                </p>
-              </>
-            )}
-          </div>
+          <h2 style={{ color: '#1a1a1a', fontSize: '32px', marginBottom: '16px' }}>Research Findings</h2>
+          <p style={{ color: '#666', fontSize: '18px' }}>Click to add subtitle</p>
         </div>
       </div>
     </div>
   );
 }
 
-// Toolbar Button Component
-function ToolbarButton({ icon: Icon, tooltip, accent }) {
-  return (
-    <button
-      title={tooltip}
-      style={{
-        padding: '8px',
-        borderRadius: '4px',
-        border: 'none',
-        backgroundColor: accent ? colors.accent + '20' : 'transparent',
-        color: accent ? colors.accent : colors.textSecondary,
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Icon size={16} />
-    </button>
-  );
-}
-
-function ToolbarDivider() {
-  return (
-    <div style={{
-      width: '1px',
-      height: '20px',
-      backgroundColor: colors.border,
-      margin: '0 8px',
-    }} />
-  );
-}
-
 // Research Companion Component
 function ResearchCompanion() {
+  const [searchQuery, setSearchQuery] = useState('');
+
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '24px' }}>
-      <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>Research Companion</h2>
-      <p style={{ color: colors.textMuted, marginBottom: '24px' }}>Find credible, peer-reviewed sources for your research</p>
-      
+    <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+      {/* Search Panel */}
       <div style={{
+        width: '400px',
+        borderRight: `1px solid ${colors.border}`,
         display: 'flex',
-        gap: '12px',
-        marginBottom: '24px',
+        flexDirection: 'column',
+        backgroundColor: colors.bgSecondary,
       }}>
-        <input
-          type="text"
-          placeholder="Search academic sources..."
-          style={{
-            flex: 1,
-            padding: '14px 20px',
+        <div style={{ padding: '20px' }}>
+          <h2 style={{ fontSize: '18px', marginBottom: '16px', fontWeight: '600' }}>Research Companion</h2>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '12px 16px',
             borderRadius: '12px',
-            border: `1px solid ${colors.border}`,
-            backgroundColor: colors.bgSecondary,
-            color: colors.textPrimary,
-            fontSize: '14px',
-          }}
-        />
-        <button style={{
-          padding: '14px 28px',
-          borderRadius: '12px',
-          border: 'none',
-          backgroundColor: colors.accent,
-          color: '#fff',
-          fontWeight: '600',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-        }}>
-          <Search size={18} />
-          Search
-        </button>
-      </div>
-
-      {/* Source Filters */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap' }}>
-        {['All Sources', 'JSTOR', 'PubMed', 'Nature', 'Springer', 'Wiley'].map(source => (
-          <button
-            key={source}
-            style={{
-              padding: '8px 16px',
-              borderRadius: '20px',
-              border: `1px solid ${colors.border}`,
-              backgroundColor: source === 'All Sources' ? colors.accent : 'transparent',
-              color: source === 'All Sources' ? '#fff' : colors.textSecondary,
-              fontSize: '13px',
-              cursor: 'pointer',
-            }}
-          >
-            {source}
-          </button>
-        ))}
-      </div>
-
-      {/* Results */}
-      <div style={{ flex: 1, overflowY: 'auto' }}>
-        {[1, 2, 3].map(i => (
-          <div key={i} style={{
-            padding: '20px',
-            marginBottom: '12px',
-            borderRadius: '12px',
-            backgroundColor: colors.bgSecondary,
+            backgroundColor: colors.bgTertiary,
             border: `1px solid ${colors.border}`,
           }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-              <div style={{
-                padding: '8px',
-                borderRadius: '8px',
-                backgroundColor: colors.accent + '20',
-              }}>
-                <BookOpen size={20} color={colors.accent} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <h4 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '6px' }}>
-                  Sample Research Paper Title #{i}
-                </h4>
-                <p style={{ fontSize: '13px', color: colors.textMuted, marginBottom: '8px' }}>
-                  Author Name et al. • 2024 • Nature Communications
-                </p>
-                <p style={{ fontSize: '13px', color: colors.textSecondary, lineHeight: '1.6' }}>
-                  Abstract excerpt showing the key findings and methodology of this peer-reviewed research paper...
-                </p>
-                <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                  <button style={{
-                    padding: '6px 12px',
-                    borderRadius: '6px',
-                    border: 'none',
-                    backgroundColor: colors.accent,
-                    color: '#fff',
-                    fontSize: '12px',
-                    cursor: 'pointer',
-                  }}>
-                    Add to Citations
-                  </button>
-                  <button style={{
-                    padding: '6px 12px',
-                    borderRadius: '6px',
-                    border: `1px solid ${colors.border}`,
-                    backgroundColor: 'transparent',
-                    color: colors.textSecondary,
-                    fontSize: '12px',
-                    cursor: 'pointer',
-                  }}>
-                    View Full Paper
-                  </button>
-                </div>
-              </div>
-            </div>
+            <Search size={18} color={colors.textMuted} />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search academic sources..."
+              style={{
+                flex: 1,
+                border: 'none',
+                backgroundColor: 'transparent',
+                color: colors.textPrimary,
+                fontSize: '14px',
+                outline: 'none',
+              }}
+            />
           </div>
-        ))}
+        </div>
+
+        {/* Database Filters */}
+        <div style={{ padding: '0 20px 20px' }}>
+          <div style={{ fontSize: '12px', color: colors.textMuted, marginBottom: '12px', fontWeight: '600' }}>
+            DATABASES
+          </div>
+          {['JSTOR', 'PubMed', 'IEEE Xplore', 'Google Scholar', 'Scopus'].map((db, idx) => (
+            <label key={idx} style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 0',
+              cursor: 'pointer',
+            }}>
+              <input type="checkbox" defaultChecked style={{ accentColor: colors.accent }} />
+              <span style={{ fontSize: '13px' }}>{db}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Results Area */}
+      <div style={{ flex: 1, padding: '20px', overflowY: 'auto' }}>
+        <div style={{ marginBottom: '20px' }}>
+          <span style={{ color: colors.textMuted, fontSize: '13px' }}>
+            Enter a search query to find peer-reviewed academic sources
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -1317,101 +1228,98 @@ function ResearchCompanion() {
 
 // Citation Manager Component
 function CitationManager() {
-  return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '24px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-        <div>
-          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '4px' }}>Citation Manager</h2>
-          <p style={{ color: colors.textMuted }}>Manage and format your citations</p>
-        </div>
-        <select style={{
-          padding: '10px 16px',
-          borderRadius: '8px',
-          border: `1px solid ${colors.border}`,
-          backgroundColor: colors.bgSecondary,
-          color: colors.textPrimary,
-          fontSize: '13px',
-        }}>
-          <option>APA 7th Edition</option>
-          <option>MLA 9th Edition</option>
-          <option>Chicago</option>
-          <option>Harvard</option>
-          <option>IEEE</option>
-        </select>
-      </div>
+  const citations = [
+    { id: 1, title: 'Advances in Machine Learning', author: 'Smith et al.', year: 2024, source: 'Nature', type: 'Journal Article' },
+    { id: 2, title: 'Quantum Computing Fundamentals', author: 'Johnson, A.', year: 2023, source: 'IEEE', type: 'Conference Paper' },
+    { id: 3, title: 'Data Science Methodology', author: 'Williams & Brown', year: 2023, source: 'Springer', type: 'Book Chapter' },
+  ];
 
-      {/* Citation List */}
-      <div style={{ flex: 1, overflowY: 'auto' }}>
-        {[1, 2, 3, 4].map(i => (
-          <div key={i} style={{
-            padding: '16px',
-            marginBottom: '8px',
-            borderRadius: '10px',
-            backgroundColor: colors.bgSecondary,
-            border: `1px solid ${colors.border}`,
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '12px',
-          }}>
-            <span style={{
-              padding: '4px 10px',
-              borderRadius: '4px',
+  return (
+    <div style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '600' }}>Citation Manager</h2>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button style={{
+              padding: '10px 16px',
+              borderRadius: '8px',
+              border: `1px solid ${colors.border}`,
+              backgroundColor: colors.bgSecondary,
+              color: colors.textPrimary,
+              fontSize: '13px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}>
+              <Download size={16} />
+              Export
+            </button>
+            <button style={{
+              padding: '10px 16px',
+              borderRadius: '8px',
+              border: 'none',
               backgroundColor: colors.accent,
               color: '#fff',
-              fontSize: '12px',
+              fontSize: '13px',
               fontWeight: '600',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
             }}>
-              {i}
-            </span>
-            <div style={{ flex: 1 }}>
-              <p style={{ fontSize: '13px', lineHeight: '1.6' }}>
-                Smith, J., & Johnson, M. (2024). Research methodology in academic studies. 
-                <span style={{ color: colors.accent }}> Nature Communications, 15</span>(3), 245-267.
-              </p>
-            </div>
-            <div style={{ display: 'flex', gap: '4px' }}>
-              <button style={{
-                padding: '6px',
-                borderRadius: '4px',
-                border: 'none',
-                backgroundColor: 'transparent',
-                color: colors.textMuted,
-                cursor: 'pointer',
-              }}>
-                <Copy size={14} />
-              </button>
-              <button style={{
-                padding: '6px',
-                borderRadius: '4px',
-                border: 'none',
-                backgroundColor: 'transparent',
-                color: colors.textMuted,
-                cursor: 'pointer',
-              }}>
-                <Trash2 size={14} />
-              </button>
-            </div>
+              <Plus size={16} />
+              Add Citation
+            </button>
           </div>
-        ))}
-      </div>
+        </div>
 
-      <button style={{
-        marginTop: '16px',
-        padding: '14px',
-        borderRadius: '10px',
-        border: 'none',
-        backgroundColor: colors.accent,
-        color: '#fff',
-        fontWeight: '600',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '8px',
-      }}>
-        <Download size={18} />
-        Export Bibliography
-      </button>
+        {/* Citations List */}
+        <div style={{
+          backgroundColor: colors.bgSecondary,
+          borderRadius: '12px',
+          border: `1px solid ${colors.border}`,
+          overflow: 'hidden',
+        }}>
+          {citations.map((cite, idx) => (
+            <div key={cite.id} style={{
+              padding: '16px 20px',
+              borderBottom: idx < citations.length - 1 ? `1px solid ${colors.border}` : 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '16px',
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '8px',
+                backgroundColor: colors.bgTertiary,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+                <FileText size={18} color={colors.accent} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '14px', fontWeight: '500', marginBottom: '4px' }}>{cite.title}</div>
+                <div style={{ fontSize: '12px', color: colors.textMuted }}>
+                  {cite.author} • {cite.year} • {cite.source} • {cite.type}
+                </div>
+              </div>
+              <button style={{
+                padding: '8px',
+                borderRadius: '6px',
+                border: 'none',
+                backgroundColor: 'transparent',
+                color: colors.textMuted,
+                cursor: 'pointer',
+              }}>
+                <MoreVertical size={18} />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -1419,209 +1327,87 @@ function CitationManager() {
 // Admin Dashboard Component
 function AdminDashboard() {
   const stats = [
-    { label: 'Total Users', value: '12,847', change: '+12%', icon: Users, color: colors.accent },
-    { label: 'Active Sessions', value: '3,241', change: '+8%', icon: Activity, color: colors.success },
-    { label: 'Documents Created', value: '45,892', change: '+23%', icon: FileText, color: colors.info },
-    { label: 'Integrity Flags', value: '127', change: '-5%', icon: Flag, color: colors.warning },
+    { label: 'Total Users', value: '12,847', change: '+12%', icon: Users },
+    { label: 'Documents Created', value: '45,231', change: '+8%', icon: FileText },
+    { label: 'AI Queries', value: '128,459', change: '+23%', icon: Sparkles },
+    { label: 'Citations Added', value: '89,120', change: '+15%', icon: Quote },
   ];
 
   return (
-    <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
-      <div style={{ marginBottom: '24px' }}>
-        <h2 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '4px' }}>Analytics Dashboard</h2>
-        <p style={{ color: colors.textMuted }}>Monitor PEAR usage across your institution</p>
-      </div>
+    <div style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '24px' }}>Analytics Dashboard</h2>
+        
+        {/* Stats Grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '16px',
+          marginBottom: '24px',
+        }}>
+          {stats.map((stat, idx) => (
+            <div key={idx} style={{
+              padding: '20px',
+              borderRadius: '12px',
+              backgroundColor: colors.bgSecondary,
+              border: `1px solid ${colors.border}`,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <stat.icon size={20} color={colors.accent} />
+                <span style={{
+                  fontSize: '12px',
+                  color: colors.success,
+                  fontWeight: '600',
+                }}>{stat.change}</span>
+              </div>
+              <div style={{ fontSize: '24px', fontWeight: '700', marginBottom: '4px' }}>{stat.value}</div>
+              <div style={{ fontSize: '13px', color: colors.textMuted }}>{stat.label}</div>
+            </div>
+          ))}
+        </div>
 
-      {/* Stats Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: '16px',
-        marginBottom: '24px',
-      }}>
-        {stats.map((stat, idx) => (
-          <div key={idx} style={{
-            padding: '24px',
-            borderRadius: '16px',
+        {/* Charts Placeholder */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '2fr 1fr',
+          gap: '16px',
+        }}>
+          <div style={{
+            padding: '20px',
+            borderRadius: '12px',
+            backgroundColor: colors.bgSecondary,
+            border: `1px solid ${colors.border}`,
+            minHeight: '300px',
+          }}>
+            <h3 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px' }}>Usage Over Time</h3>
+            <div style={{
+              height: '240px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: colors.textMuted,
+            }}>
+              <LineChart size={48} />
+            </div>
+          </div>
+          <div style={{
+            padding: '20px',
+            borderRadius: '12px',
             backgroundColor: colors.bgSecondary,
             border: `1px solid ${colors.border}`,
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <div style={{
-                padding: '12px',
-                borderRadius: '12px',
-                backgroundColor: stat.color + '20',
-              }}>
-                <stat.icon size={24} color={stat.color} />
-              </div>
-              <span style={{
-                padding: '4px 10px',
-                borderRadius: '20px',
-                backgroundColor: stat.change.startsWith('+') ? colors.success + '20' : colors.danger + '20',
-                color: stat.change.startsWith('+') ? colors.success : colors.danger,
-                fontSize: '12px',
-                fontWeight: '600',
-              }}>
-                {stat.change}
-              </span>
+            <h3 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px' }}>User Distribution</h3>
+            <div style={{
+              height: '240px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: colors.textMuted,
+            }}>
+              <PieChart size={48} />
             </div>
-            <div style={{ fontSize: '32px', fontWeight: '700', marginBottom: '4px' }}>{stat.value}</div>
-            <div style={{ fontSize: '14px', color: colors.textMuted }}>{stat.label}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Charts Row */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '2fr 1fr',
-        gap: '16px',
-        marginBottom: '24px',
-      }}>
-        {/* Usage Chart */}
-        <div style={{
-          padding: '24px',
-          borderRadius: '16px',
-          backgroundColor: colors.bgSecondary,
-          border: `1px solid ${colors.border}`,
-        }}>
-          <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '20px' }}>Platform Usage Over Time</h3>
-          <div style={{
-            height: '200px',
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'space-between',
-            gap: '8px',
-            paddingTop: '20px',
-          }}>
-            {[65, 78, 82, 75, 90, 85, 95, 88, 92, 98, 94, 100].map((height, idx) => (
-              <div
-                key={idx}
-                style={{
-                  flex: 1,
-                  height: `${height}%`,
-                  backgroundColor: colors.accent,
-                  borderRadius: '4px 4px 0 0',
-                  opacity: 0.7 + (idx * 0.025),
-                }}
-              />
-            ))}
-          </div>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            marginTop: '12px',
-            fontSize: '11px',
-            color: colors.textMuted,
-          }}>
-            {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map(month => (
-              <span key={month}>{month}</span>
-            ))}
           </div>
         </div>
-
-        {/* User Distribution */}
-        <div style={{
-          padding: '24px',
-          borderRadius: '16px',
-          backgroundColor: colors.bgSecondary,
-          border: `1px solid ${colors.border}`,
-        }}>
-          <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '20px' }}>User Distribution</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {[
-              { tier: 'A1 - Core', count: '9,234', percent: 72, color: colors.accent },
-              { tier: 'A2 - Premium', count: '2,891', percent: 22, color: colors.info },
-              { tier: 'A3 - Signature', count: '722', percent: 6, color: colors.warning },
-            ].map((item, idx) => (
-              <div key={idx}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <span style={{ fontSize: '13px' }}>{item.tier}</span>
-                  <span style={{ fontSize: '13px', color: colors.textMuted }}>{item.count}</span>
-                </div>
-                <div style={{
-                  height: '8px',
-                  backgroundColor: colors.bgTertiary,
-                  borderRadius: '4px',
-                  overflow: 'hidden',
-                }}>
-                  <div style={{
-                    width: `${item.percent}%`,
-                    height: '100%',
-                    backgroundColor: item.color,
-                    borderRadius: '4px',
-                  }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Activity */}
-      <div style={{
-        padding: '24px',
-        borderRadius: '16px',
-        backgroundColor: colors.bgSecondary,
-        border: `1px solid ${colors.border}`,
-      }}>
-        <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '20px' }}>Recent Activity Log</h3>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              {['User', 'Action', 'Resource', 'Timestamp', 'Status'].map(header => (
-                <th key={header} style={{
-                  padding: '12px',
-                  textAlign: 'left',
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  color: colors.textMuted,
-                  borderBottom: `1px solid ${colors.border}`,
-                }}>
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              { user: 'john.smith@utoronto.ca', action: 'Document Created', resource: 'Research Paper Draft', time: '2 mins ago', status: 'success' },
-              { user: 'sarah.jones@utoronto.ca', action: 'Integrity Check', resource: 'Final Thesis.docx', time: '15 mins ago', status: 'warning' },
-              { user: 'mike.chen@utoronto.ca', action: 'Export Citations', resource: 'Bibliography.bib', time: '32 mins ago', status: 'success' },
-              { user: 'emily.davis@utoronto.ca', action: 'AI Query', resource: 'Research Companion', time: '1 hour ago', status: 'success' },
-              { user: 'prof.wilson@utoronto.ca', action: 'Plagiarism Review', resource: 'Student Submission', time: '2 hours ago', status: 'flagged' },
-            ].map((row, idx) => (
-              <tr key={idx}>
-                <td style={{ padding: '14px 12px', fontSize: '13px', borderBottom: `1px solid ${colors.border}` }}>
-                  {row.user}
-                </td>
-                <td style={{ padding: '14px 12px', fontSize: '13px', borderBottom: `1px solid ${colors.border}` }}>
-                  {row.action}
-                </td>
-                <td style={{ padding: '14px 12px', fontSize: '13px', borderBottom: `1px solid ${colors.border}`, color: colors.textSecondary }}>
-                  {row.resource}
-                </td>
-                <td style={{ padding: '14px 12px', fontSize: '13px', borderBottom: `1px solid ${colors.border}`, color: colors.textMuted }}>
-                  {row.time}
-                </td>
-                <td style={{ padding: '14px 12px', borderBottom: `1px solid ${colors.border}` }}>
-                  <span style={{
-                    padding: '4px 10px',
-                    borderRadius: '20px',
-                    fontSize: '11px',
-                    fontWeight: '600',
-                    backgroundColor: row.status === 'success' ? colors.success + '20' : 
-                                     row.status === 'warning' ? colors.warning + '20' : colors.danger + '20',
-                    color: row.status === 'success' ? colors.success : 
-                           row.status === 'warning' ? colors.warning : colors.danger,
-                  }}>
-                    {row.status === 'success' ? 'Complete' : row.status === 'warning' ? 'Review' : 'Flagged'}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
     </div>
   );
@@ -1629,649 +1415,93 @@ function AdminDashboard() {
 
 // Governance Controls Component
 function GovernanceControls() {
-  const [activeSection, setActiveSection] = useState('integrity');
-
   return (
-    <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-      {/* Governance Sidebar */}
-      <div style={{
-        width: '240px',
-        backgroundColor: colors.bgSecondary,
-        borderRight: `1px solid ${colors.border}`,
-        padding: '16px',
-      }}>
-        <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '16px', color: colors.textMuted }}>
-          GOVERNANCE CONTROLS
-        </h3>
-        {[
-          { id: 'integrity', icon: Shield, label: 'Academic Integrity' },
-          { id: 'plagiarism', icon: AlertTriangle, label: 'Plagiarism Detection' },
-          { id: 'traceability', icon: Eye, label: 'Traceability' },
-          { id: 'compliance', icon: CheckCircle, label: 'Compliance' },
-          { id: 'data', icon: Database, label: 'Data Controls' },
-        ].map(item => (
-          <button
-            key={item.id}
-            onClick={() => setActiveSection(item.id)}
-            style={{
-              width: '100%',
-              padding: '12px',
-              marginBottom: '4px',
-              borderRadius: '8px',
-              border: 'none',
-              backgroundColor: activeSection === item.id ? colors.bgTertiary : 'transparent',
-              color: activeSection === item.id ? colors.accent : colors.textSecondary,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              cursor: 'pointer',
-              fontSize: '13px',
-              textAlign: 'left',
-            }}
-          >
-            <item.icon size={18} />
-            {item.label}
-          </button>
-        ))}
-      </div>
+    <div style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
+      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>Governance Controls</h2>
+        <p style={{ color: colors.textMuted, marginBottom: '24px' }}>
+          Manage institutional AI policies and academic integrity settings
+        </p>
 
-      {/* Main Content */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
-        {activeSection === 'integrity' && <AcademicIntegrityPanel />}
-        {activeSection === 'plagiarism' && <PlagiarismPanel />}
-        {activeSection === 'traceability' && <TraceabilityPanel />}
-        {activeSection === 'compliance' && <CompliancePanel />}
-        {activeSection === 'data' && <DataControlsPanel />}
-      </div>
-    </div>
-  );
-}
-
-// Academic Integrity Panel
-function AcademicIntegrityPanel() {
-  return (
-    <div>
-      <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>Academic Integrity Monitor</h2>
-      <p style={{ color: colors.textMuted, marginBottom: '24px' }}>
-        Monitor and enforce academic integrity policies across your institution
-      </p>
-
-      {/* Alert Cards */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '16px',
-        marginBottom: '24px',
-      }}>
-        {[
-          { label: 'Active Violations', value: '23', severity: 'high' },
-          { label: 'Pending Review', value: '47', severity: 'medium' },
-          { label: 'Resolved This Week', value: '156', severity: 'low' },
-        ].map((card, idx) => (
-          <div key={idx} style={{
+        {/* Policy Cards */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '16px',
+        }}>
+          {/* AI Usage Policies */}
+          <div style={{
             padding: '20px',
             borderRadius: '12px',
             backgroundColor: colors.bgSecondary,
-            borderLeft: `4px solid ${
-              card.severity === 'high' ? colors.danger :
-              card.severity === 'medium' ? colors.warning : colors.success
-            }`,
-          }}>
-            <div style={{ fontSize: '28px', fontWeight: '700', marginBottom: '4px' }}>{card.value}</div>
-            <div style={{ fontSize: '13px', color: colors.textMuted }}>{card.label}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Violations Table */}
-      <div style={{
-        padding: '20px',
-        borderRadius: '12px',
-        backgroundColor: colors.bgSecondary,
-        border: `1px solid ${colors.border}`,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: '600' }}>Recent Integrity Flags</h3>
-          <button style={{
-            padding: '8px 14px',
-            borderRadius: '6px',
             border: `1px solid ${colors.border}`,
-            backgroundColor: 'transparent',
-            color: colors.textSecondary,
-            fontSize: '12px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
           }}>
-            <Filter size={14} />
-            Filter
-          </button>
-        </div>
-
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              {['Student', 'Document', 'Violation Type', 'AI Usage %', 'Date', 'Actions'].map(header => (
-                <th key={header} style={{
-                  padding: '12px 8px',
-                  textAlign: 'left',
-                  fontSize: '11px',
-                  fontWeight: '600',
-                  color: colors.textMuted,
-                  borderBottom: `1px solid ${colors.border}`,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                }}>
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
+            <h3 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px' }}>AI Usage Policies</h3>
             {[
-              { student: 'Alex Thompson', doc: 'Essay_Final.docx', type: 'High AI Content', ai: '78%', date: 'Nov 25, 2025' },
-              { student: 'Maria Garcia', doc: 'Research_Paper.docx', type: 'Citation Missing', ai: '12%', date: 'Nov 24, 2025' },
-              { student: 'James Wilson', doc: 'Lab_Report.docx', type: 'Duplicate Content', ai: '45%', date: 'Nov 24, 2025' },
-            ].map((row, idx) => (
-              <tr key={idx}>
-                <td style={{ padding: '14px 8px', fontSize: '13px', borderBottom: `1px solid ${colors.border}` }}>
-                  {row.student}
-                </td>
-                <td style={{ padding: '14px 8px', fontSize: '13px', borderBottom: `1px solid ${colors.border}`, color: colors.accent }}>
-                  {row.doc}
-                </td>
-                <td style={{ padding: '14px 8px', fontSize: '13px', borderBottom: `1px solid ${colors.border}` }}>
-                  <span style={{
-                    padding: '4px 8px',
-                    borderRadius: '4px',
-                    backgroundColor: colors.danger + '20',
-                    color: colors.danger,
-                    fontSize: '11px',
-                  }}>
-                    {row.type}
-                  </span>
-                </td>
-                <td style={{ padding: '14px 8px', fontSize: '13px', borderBottom: `1px solid ${colors.border}` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{
-                      width: '60px',
-                      height: '6px',
-                      backgroundColor: colors.bgTertiary,
-                      borderRadius: '3px',
-                      overflow: 'hidden',
-                    }}>
-                      <div style={{
-                        width: row.ai,
-                        height: '100%',
-                        backgroundColor: parseInt(row.ai) > 50 ? colors.danger : colors.warning,
-                      }} />
-                    </div>
-                    {row.ai}
-                  </div>
-                </td>
-                <td style={{ padding: '14px 8px', fontSize: '13px', borderBottom: `1px solid ${colors.border}`, color: colors.textMuted }}>
-                  {row.date}
-                </td>
-                <td style={{ padding: '14px 8px', borderBottom: `1px solid ${colors.border}` }}>
-                  <button style={{
-                    padding: '6px 12px',
-                    borderRadius: '4px',
-                    border: 'none',
-                    backgroundColor: colors.accent,
-                    color: '#fff',
-                    fontSize: '11px',
-                    cursor: 'pointer',
-                  }}>
-                    Review
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-// Plagiarism Panel
-function PlagiarismPanel() {
-  return (
-    <div>
-      <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>Plagiarism Detection</h2>
-      <p style={{ color: colors.textMuted, marginBottom: '24px' }}>
-        AI-powered plagiarism detection integrated with academic sources
-      </p>
-
-      {/* Upload Section */}
-      <div style={{
-        padding: '40px',
-        borderRadius: '12px',
-        border: `2px dashed ${colors.border}`,
-        backgroundColor: colors.bgSecondary,
-        textAlign: 'center',
-        marginBottom: '24px',
-      }}>
-        <Download size={48} color={colors.textMuted} style={{ marginBottom: '16px' }} />
-        <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px' }}>Upload Documents for Review</h3>
-        <p style={{ color: colors.textMuted, fontSize: '13px', marginBottom: '16px' }}>
-          Drag and drop files or click to browse
-        </p>
-        <button style={{
-          padding: '12px 24px',
-          borderRadius: '8px',
-          border: 'none',
-          backgroundColor: colors.accent,
-          color: '#fff',
-          fontWeight: '600',
-          cursor: 'pointer',
-        }}>
-          Select Files
-        </button>
-      </div>
-
-      {/* Recent Scans */}
-      <div style={{
-        padding: '20px',
-        borderRadius: '12px',
-        backgroundColor: colors.bgSecondary,
-        border: `1px solid ${colors.border}`,
-      }}>
-        <h3 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px' }}>Recent Scans</h3>
-        {[
-          { name: 'Thesis_Draft_v3.docx', similarity: 8, status: 'clean', time: '10 mins ago' },
-          { name: 'Assignment_2.docx', similarity: 34, status: 'review', time: '1 hour ago' },
-          { name: 'Research_Methods.docx', similarity: 12, status: 'clean', time: '3 hours ago' },
-        ].map((scan, idx) => (
-          <div key={idx} style={{
-            display: 'flex',
-            alignItems: 'center',
-            padding: '14px',
-            marginBottom: '8px',
-            borderRadius: '8px',
-            backgroundColor: colors.bgTertiary,
-          }}>
-            <FileText size={20} color={colors.textSecondary} />
-            <div style={{ marginLeft: '12px', flex: 1 }}>
-              <div style={{ fontSize: '13px', fontWeight: '500' }}>{scan.name}</div>
-              <div style={{ fontSize: '11px', color: colors.textMuted }}>{scan.time}</div>
-            </div>
-            <div style={{
-              padding: '6px 12px',
-              borderRadius: '20px',
-              backgroundColor: scan.status === 'clean' ? colors.success + '20' : colors.warning + '20',
-              color: scan.status === 'clean' ? colors.success : colors.warning,
-              fontSize: '12px',
-              fontWeight: '600',
-              marginRight: '12px',
-            }}>
-              {scan.similarity}% Similarity
-            </div>
-            <button style={{
-              padding: '6px 12px',
-              borderRadius: '4px',
-              border: `1px solid ${colors.border}`,
-              backgroundColor: 'transparent',
-              color: colors.textSecondary,
-              fontSize: '11px',
-              cursor: 'pointer',
-            }}>
-              View Report
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// Traceability Panel
-function TraceabilityPanel() {
-  return (
-    <div>
-      <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>Usage Traceability</h2>
-      <p style={{ color: colors.textMuted, marginBottom: '24px' }}>
-        Complete audit trail of all AI interactions and document changes
-      </p>
-
-      {/* Search */}
-      <div style={{
-        display: 'flex',
-        gap: '12px',
-        marginBottom: '24px',
-      }}>
-        <input
-          type="text"
-          placeholder="Search by user, document, or action..."
-          style={{
-            flex: 1,
-            padding: '12px 16px',
-            borderRadius: '8px',
-            border: `1px solid ${colors.border}`,
-            backgroundColor: colors.bgSecondary,
-            color: colors.textPrimary,
-            fontSize: '13px',
-          }}
-        />
-        <input
-          type="date"
-          style={{
-            padding: '12px 16px',
-            borderRadius: '8px',
-            border: `1px solid ${colors.border}`,
-            backgroundColor: colors.bgSecondary,
-            color: colors.textPrimary,
-            fontSize: '13px',
-          }}
-        />
-        <button style={{
-          padding: '12px 20px',
-          borderRadius: '8px',
-          border: 'none',
-          backgroundColor: colors.accent,
-          color: '#fff',
-          fontWeight: '600',
-          cursor: 'pointer',
-        }}>
-          Search
-        </button>
-      </div>
-
-      {/* Timeline */}
-      <div style={{
-        padding: '20px',
-        borderRadius: '12px',
-        backgroundColor: colors.bgSecondary,
-        border: `1px solid ${colors.border}`,
-      }}>
-        <h3 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '20px' }}>Activity Timeline</h3>
-        
-        {[
-          { time: '14:32', user: 'john.smith@utoronto.ca', action: 'AI Query', detail: '"What are the key factors affecting climate change?"', type: 'query' },
-          { time: '14:28', user: 'john.smith@utoronto.ca', action: 'Citation Added', detail: 'Smith et al. (2024) added to document', type: 'citation' },
-          { time: '14:15', user: 'sarah.jones@utoronto.ca', action: 'Document Export', detail: 'Research_Paper.docx exported as PDF', type: 'export' },
-          { time: '13:45', user: 'mike.chen@utoronto.ca', action: 'AI Writing Assist', detail: 'Paragraph expansion in Section 3', type: 'assist' },
-          { time: '13:22', user: 'emily.davis@utoronto.ca', action: 'Plagiarism Check', detail: 'Thesis_Chapter_2.docx - 4% similarity', type: 'check' },
-        ].map((item, idx) => (
-          <div key={idx} style={{
-            display: 'flex',
-            gap: '16px',
-            paddingLeft: '20px',
-            paddingBottom: '20px',
-            borderLeft: `2px solid ${colors.border}`,
-            position: 'relative',
-          }}>
-            <div style={{
-              position: 'absolute',
-              left: '-6px',
-              top: '0',
-              width: '10px',
-              height: '10px',
-              borderRadius: '50%',
-              backgroundColor: colors.accent,
-            }} />
-            <div style={{
-              fontSize: '12px',
-              color: colors.textMuted,
-              width: '50px',
-              flexShrink: 0,
-            }}>
-              {item.time}
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                <span style={{ fontSize: '13px', fontWeight: '500' }}>{item.action}</span>
-                <span style={{
-                  padding: '2px 8px',
-                  borderRadius: '4px',
-                  backgroundColor: colors.bgTertiary,
-                  fontSize: '10px',
-                  color: colors.textMuted,
+              { label: 'Require citation for AI-assisted content', enabled: true },
+              { label: 'Flag documents with >50% AI-generated content', enabled: true },
+              { label: 'Auto-detect uncited sources', enabled: true },
+            ].map((policy, idx) => (
+              <div key={idx} style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '12px 0',
+                borderBottom: idx < 2 ? `1px solid ${colors.border}` : 'none',
+              }}>
+                <span style={{ fontSize: '13px' }}>{policy.label}</span>
+                <div style={{
+                  width: '44px',
+                  height: '24px',
+                  borderRadius: '12px',
+                  backgroundColor: policy.enabled ? colors.accent : colors.bgTertiary,
+                  position: 'relative',
+                  cursor: 'pointer',
                 }}>
-                  {item.type}
-                </span>
+                  <div style={{
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '50%',
+                    backgroundColor: '#fff',
+                    position: 'absolute',
+                    top: '3px',
+                    left: policy.enabled ? '23px' : '3px',
+                    transition: 'left 0.2s ease',
+                  }} />
+                </div>
               </div>
-              <div style={{ fontSize: '12px', color: colors.textMuted, marginBottom: '4px' }}>{item.user}</div>
-              <div style={{ fontSize: '12px', color: colors.textSecondary }}>{item.detail}</div>
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
-// Compliance Panel
-function CompliancePanel() {
-  return (
-    <div>
-      <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>Compliance Settings</h2>
-      <p style={{ color: colors.textMuted, marginBottom: '24px' }}>
-        Configure academic integrity policies and compliance rules
-      </p>
-
-      {/* Policy Settings */}
-      <div style={{
-        padding: '20px',
-        borderRadius: '12px',
-        backgroundColor: colors.bgSecondary,
-        border: `1px solid ${colors.border}`,
-        marginBottom: '16px',
-      }}>
-        <h3 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px' }}>AI Usage Policies</h3>
-        
-        {[
-          { label: 'Require citation for AI-assisted content', enabled: true },
-          { label: 'Flag documents with >50% AI-generated content', enabled: true },
-          { label: 'Auto-detect uncited sources', enabled: true },
-          { label: 'Notify instructors of integrity violations', enabled: false },
-          { label: 'Block submission of flagged documents', enabled: false },
-        ].map((policy, idx) => (
-          <div key={idx} style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '14px 0',
-            borderBottom: idx < 4 ? `1px solid ${colors.border}` : 'none',
+          {/* Data Privacy */}
+          <div style={{
+            padding: '20px',
+            borderRadius: '12px',
+            backgroundColor: colors.bgSecondary,
+            border: `1px solid ${colors.border}`,
           }}>
-            <span style={{ fontSize: '13px' }}>{policy.label}</span>
-            <button
-              style={{
-                width: '48px',
-                height: '26px',
-                borderRadius: '13px',
-                border: 'none',
-                backgroundColor: policy.enabled ? colors.accent : colors.bgTertiary,
-                cursor: 'pointer',
-                position: 'relative',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              <div style={{
-                width: '20px',
-                height: '20px',
-                borderRadius: '50%',
-                backgroundColor: '#fff',
-                position: 'absolute',
-                top: '3px',
-                left: policy.enabled ? '25px' : '3px',
-                transition: 'all 0.2s ease',
-              }} />
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {/* Thresholds */}
-      <div style={{
-        padding: '20px',
-        borderRadius: '12px',
-        backgroundColor: colors.bgSecondary,
-        border: `1px solid ${colors.border}`,
-      }}>
-        <h3 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px' }}>Detection Thresholds</h3>
-        
-        {[
-          { label: 'AI Content Warning Threshold', value: 30 },
-          { label: 'AI Content Flag Threshold', value: 50 },
-          { label: 'Plagiarism Warning Threshold', value: 15 },
-          { label: 'Plagiarism Flag Threshold', value: 25 },
-        ].map((threshold, idx) => (
-          <div key={idx} style={{ marginBottom: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span style={{ fontSize: '13px' }}>{threshold.label}</span>
-              <span style={{ fontSize: '13px', fontWeight: '600', color: colors.accent }}>{threshold.value}%</span>
+            <h3 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px' }}>Data Privacy</h3>
+            <div style={{
+              padding: '16px',
+              borderRadius: '8px',
+              backgroundColor: colors.success + '15',
+              border: `1px solid ${colors.success}40`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '16px',
+            }}>
+              <Lock size={20} color={colors.success} />
+              <div>
+                <div style={{ fontSize: '13px', fontWeight: '600', color: colors.success }}>Closed-Loop Active</div>
+                <div style={{ fontSize: '12px', color: colors.textMuted }}>Data not used for model training</div>
+              </div>
             </div>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              defaultValue={threshold.value}
-              style={{
-                width: '100%',
-                accentColor: colors.accent,
-              }}
-            />
+            <p style={{ fontSize: '13px', color: colors.textMuted, lineHeight: '1.6' }}>
+              Your institutional data is protected and never leaves your secure environment.
+            </p>
           </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// Data Controls Panel
-function DataControlsPanel() {
-  return (
-    <div>
-      <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>Data Controls</h2>
-      <p style={{ color: colors.textMuted, marginBottom: '24px' }}>
-        Manage institutional data privacy and security settings
-      </p>
-
-      {/* Closed Loop System Status */}
-      <div style={{
-        padding: '24px',
-        borderRadius: '12px',
-        backgroundColor: colors.success + '10',
-        border: `1px solid ${colors.success}40`,
-        marginBottom: '16px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '16px',
-      }}>
-        <div style={{
-          padding: '12px',
-          borderRadius: '12px',
-          backgroundColor: colors.success + '20',
-        }}>
-          <Lock size={28} color={colors.success} />
         </div>
-        <div>
-          <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '4px', color: colors.success }}>
-            Closed-Loop System Active
-          </h3>
-          <p style={{ fontSize: '13px', color: colors.textSecondary }}>
-            Institutional data is protected and not used for model training
-          </p>
-        </div>
-      </div>
-
-      {/* Data Settings */}
-      <div style={{
-        padding: '20px',
-        borderRadius: '12px',
-        backgroundColor: colors.bgSecondary,
-        border: `1px solid ${colors.border}`,
-        marginBottom: '16px',
-      }}>
-        <h3 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px' }}>Data Privacy Settings</h3>
-        
-        {[
-          { label: 'Prevent data use for AI model training', enabled: true, locked: true },
-          { label: 'Encrypt all documents at rest', enabled: true, locked: false },
-          { label: 'Anonymize usage analytics', enabled: false, locked: false },
-          { label: 'Auto-delete inactive user data (90 days)', enabled: false, locked: false },
-          { label: 'Restrict external sharing', enabled: true, locked: false },
-        ].map((setting, idx) => (
-          <div key={idx} style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '14px 0',
-            borderBottom: idx < 4 ? `1px solid ${colors.border}` : 'none',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '13px' }}>{setting.label}</span>
-              {setting.locked && (
-                <Lock size={14} color={colors.textMuted} />
-              )}
-            </div>
-            <button
-              disabled={setting.locked}
-              style={{
-                width: '48px',
-                height: '26px',
-                borderRadius: '13px',
-                border: 'none',
-                backgroundColor: setting.enabled ? colors.accent : colors.bgTertiary,
-                cursor: setting.locked ? 'not-allowed' : 'pointer',
-                position: 'relative',
-                opacity: setting.locked ? 0.7 : 1,
-              }}
-            >
-              <div style={{
-                width: '20px',
-                height: '20px',
-                borderRadius: '50%',
-                backgroundColor: '#fff',
-                position: 'absolute',
-                top: '3px',
-                left: setting.enabled ? '25px' : '3px',
-              }} />
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {/* Export & Audit */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '16px',
-      }}>
-        <button style={{
-          padding: '20px',
-          borderRadius: '12px',
-          border: `1px solid ${colors.border}`,
-          backgroundColor: colors.bgSecondary,
-          color: colors.textPrimary,
-          cursor: 'pointer',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '12px',
-        }}>
-          <Download size={24} color={colors.accent} />
-          <span style={{ fontWeight: '600' }}>Export All Data</span>
-          <span style={{ fontSize: '12px', color: colors.textMuted }}>Download institutional data archive</span>
-        </button>
-        <button style={{
-          padding: '20px',
-          borderRadius: '12px',
-          border: `1px solid ${colors.border}`,
-          backgroundColor: colors.bgSecondary,
-          color: colors.textPrimary,
-          cursor: 'pointer',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '12px',
-        }}>
-          <FileText size={24} color={colors.accent} />
-          <span style={{ fontWeight: '600' }}>Generate Audit Report</span>
-          <span style={{ fontSize: '12px', color: colors.textMuted }}>Compliance documentation</span>
-        </button>
       </div>
     </div>
   );

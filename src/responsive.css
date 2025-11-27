@@ -2,6 +2,25 @@
    PEAR App - Responsive Styles
    ============================================= */
 
+/* ==========================================
+   BASE STYLES - Desktop defaults
+   ========================================== */
+
+/* Hide mobile-only elements on desktop */
+.mobile-toggles,
+.mobile-toggle-btn,
+.panel-overlay,
+.header-menu-btn {
+  display: none;
+}
+
+/* Close buttons hidden by default */
+.canvas-toolbar .close-btn,
+.chat-panel .close-btn,
+.app-sidebar .close-btn {
+  display: none;
+}
+
 /* Tablet and below (1024px) */
 @media screen and (max-width: 1024px) {
   /* Collapse sidebar by default */
@@ -40,67 +59,208 @@
 
 /* Mobile devices (768px and below) */
 @media screen and (max-width: 768px) {
-  /* Main app layout - stack vertically */
+  /* Main app layout */
   .app-root {
     flex-direction: column !important;
+    position: relative;
+    overflow-x: hidden;
   }
 
-  /* Hide sidebar on mobile - convert to bottom nav or hamburger */
-  .app-sidebar {
+  /* ==========================================
+     MOBILE TOGGLE BUTTONS - Fixed position
+     ========================================== */
+  
+  /* Container for mobile toggle buttons */
+  .mobile-toggles {
+    display: flex !important;
     position: fixed;
-    bottom: 0;
+    bottom: 80px;
+    right: 12px;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1001;
+  }
+
+  /* Individual toggle buttons */
+  .mobile-toggle-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #20B2AA;
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+  }
+
+  .mobile-toggle-btn:active {
+    transform: scale(0.95);
+  }
+
+  .mobile-toggle-btn.active {
+    background-color: #1A9690;
+  }
+
+  /* ==========================================
+     OVERLAY - Backdrop when panels are open
+     ========================================== */
+  
+  .panel-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .panel-overlay.visible {
+    display: block;
+    opacity: 1;
+  }
+
+  /* ==========================================
+     LEFT SIDEBAR - Slide from left
+     ========================================== */
+  
+  .app-sidebar {
+    position: fixed !important;
+    top: 0;
     left: 0;
-    right: 0;
-    width: 100% !important;
-    height: 70px !important;
-    flex-direction: row !important;
-    border-right: none !important;
-    border-top: 1px solid #333434;
+    bottom: 0;
+    width: 280px !important;
+    height: 100% !important;
     z-index: 1000;
-    justify-content: space-around;
-    padding: 0 !important;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    flex-direction: column !important;
+    border-right: 1px solid #333434 !important;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
   }
 
-  /* Hide logo section on mobile */
+  .app-sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Show logo when sidebar is open */
   .app-sidebar > div:first-child {
-    display: none !important;
+    display: flex !important;
   }
 
-  /* Make nav horizontal on mobile */
+  /* Restore nav to vertical on open sidebar */
   .app-sidebar nav {
     display: flex !important;
-    flex-direction: row !important;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
-    padding: 8px !important;
-    flex: 1;
-  }
-
-  /* Nav buttons in mobile */
-  .app-sidebar nav button {
     flex-direction: column !important;
-    gap: 4px !important;
-    padding: 8px !important;
-    margin: 0 !important;
-    font-size: 10px !important;
-    min-width: 60px;
+    padding: 12px !important;
+    flex: 1;
+    overflow-y: auto;
   }
 
-  /* Hide collapse toggle on mobile */
-  .app-sidebar > button:last-child {
-    display: none !important;
-  }
-
-  /* Hide nav labels on mobile - show only icons */
-  .app-sidebar nav button span {
-    display: none !important;
-  }
-
-  /* Main content adjustments */
-  .app-root > div:last-child {
-    padding-bottom: 80px; /* Space for bottom nav */
+  .app-sidebar nav button {
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+    padding: 12px 16px !important;
+    margin-bottom: 4px !important;
+    font-size: 14px !important;
+    min-width: auto;
     width: 100%;
+  }
+
+  .app-sidebar nav button span {
+    display: inline !important;
+  }
+
+  /* Show collapse toggle as close button */
+  .app-sidebar > button:last-child {
+    display: flex !important;
+    margin: 12px !important;
+  }
+
+  /* ==========================================
+     RIGHT TOOLBAR (Workspace Tools) - Slide from right
+     ========================================== */
+  
+  .canvas-toolbar {
+    display: flex !important;
+    position: fixed !important;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 300px !important;
+    max-width: 85vw;
+    height: 100% !important;
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+    overflow-y: auto;
+  }
+
+  .canvas-toolbar.open {
+    transform: translateX(0);
+  }
+
+  /* Close button for toolbar */
+  .canvas-toolbar .close-btn {
+    display: flex !important;
+  }
+
+  /* ==========================================
+     CHAT PANEL - Slide from bottom
+     ========================================== */
+  
+  .chat-panel {
+    position: fixed !important;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100% !important;
+    height: 70vh !important;
+    max-height: 70vh !important;
+    z-index: 999;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    border-right: none !important;
+    border-top: 1px solid #333434;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .chat-panel.open {
+    transform: translateY(0);
+  }
+
+  /* Drag handle for chat panel */
+  .chat-panel::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background-color: #6B6B6B;
+    border-radius: 2px;
+  }
+
+  /* Adjust chat panel header for mobile */
+  .chat-panel > div:first-child {
+    padding-top: 20px !important;
+  }
+
+  /* ==========================================
+     MAIN CONTENT AREA
+     ========================================== */
+  
+  .app-root > div:last-child {
+    width: 100%;
+    padding-bottom: 0;
   }
 
   /* Top header adjustments */
@@ -109,6 +269,13 @@
     height: 50px !important;
     flex-wrap: wrap;
     gap: 8px;
+  }
+
+  /* Hamburger menu button in header */
+  .header-menu-btn {
+    display: flex !important;
+    padding: 8px;
+    margin-right: 8px;
   }
 
   /* Hide institution label on small screens */
@@ -123,33 +290,19 @@
   }
 
   /* ==========================================
-     CANVAS LAYOUT - Critical mobile fixes
+     CANVAS LAYOUT
      ========================================== */
   
-  /* Canvas layout container - stack vertically */
   .canvas-layout {
     flex-direction: column !important;
+    height: 100%;
   }
 
-  /* HIDE the Workspace Tools panel (right toolbar) on mobile */
-  .canvas-toolbar {
-    display: none !important;
-  }
-
-  /* Chat panel - make it collapsible/smaller on mobile */
-  .chat-panel {
-    width: 100% !important;
-    max-height: 40vh !important;
-    min-height: 200px;
-    border-right: none !important;
-    border-bottom: 1px solid #333434;
-    flex-shrink: 0;
-  }
-
-  /* Workspace panel takes remaining space */
+  /* Workspace panel takes full space when panels collapsed */
   .workspace-panel {
     flex: 1 !important;
-    min-height: 50vh;
+    width: 100% !important;
+    min-height: 100%;
   }
 
   /* Document wrapper - reduce padding on mobile */
@@ -164,6 +317,10 @@
     max-width: 100% !important;
   }
 
+  /* ==========================================
+     GRID & LAYOUT FIXES
+     ========================================== */
+
   /* Stack grid layouts */
   div[style*="grid-template-columns: 1fr 1fr"] {
     grid-template-columns: 1fr !important;
@@ -173,11 +330,6 @@
   div[style*="grid-template-columns: 1fr 2fr"],
   div[style*="grid-template-columns: 3fr 1fr"] {
     grid-template-columns: 1fr !important;
-  }
-
-  /* Canvas main area */
-  div[style*="display: 'flex'"][style*="flex: 1"] {
-    flex-direction: column !important;
   }
 
   /* Panels and cards - full width */
@@ -235,7 +387,7 @@
   /* Even more compact header */
   .app-root > div:last-child > div:first-child {
     padding: 0 8px !important;
-    justify-content: center;
+    justify-content: space-between;
   }
 
   /* Hide tier selector labels, show just tier code */
@@ -277,34 +429,43 @@
     box-sizing: border-box;
   }
 
-  /* Bottom nav - smaller */
-  .app-sidebar {
-    height: 60px !important;
-  }
-
-  .app-sidebar nav button {
-    min-width: 50px;
-    padding: 6px !important;
-  }
-
-  /* Main content with smaller bottom padding */
-  .app-root > div:last-child {
-    padding-bottom: 70px;
-  }
-
   /* ==========================================
-     CANVAS LAYOUT - Small mobile optimizations
+     COLLAPSIBLE PANELS - Small mobile tweaks
      ========================================== */
 
-  /* Chat panel - even smaller on tiny screens */
+  /* Smaller toggle buttons */
+  .mobile-toggle-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .mobile-toggles {
+    bottom: 16px;
+    right: 8px;
+    gap: 6px;
+  }
+
+  /* Sidebar - full width on tiny screens */
+  .app-sidebar {
+    width: 100% !important;
+    max-width: 100%;
+  }
+
+  /* Toolbar - nearly full width */
+  .canvas-toolbar {
+    width: 100% !important;
+    max-width: 100%;
+  }
+
+  /* Chat panel - taller on small screens */
   .chat-panel {
-    max-height: 35vh !important;
-    min-height: 180px;
+    height: 80vh !important;
+    max-height: 80vh !important;
   }
 
   /* Chat header - more compact */
   .chat-panel > div:first-child {
-    padding: 10px 12px !important;
+    padding: 16px 12px 10px !important;
   }
 
   /* Chat input area - compact */
@@ -327,9 +488,9 @@
     display: none !important;
   }
 
-  /* Formatting toolbar - hide some buttons */
+  /* Formatting toolbar - even more compact */
   .workspace-panel > div > div:first-child {
-    padding: 8px !important;
+    padding: 6px !important;
   }
 
   /* Tab labels - hide on tiny screens, show only icons */
