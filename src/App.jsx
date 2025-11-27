@@ -290,7 +290,7 @@ function TopHeader({ userTier, setUserTier, onMenuClick }) {
           <Menu size={24} />
         </button>
         <span style={{ color: colors.textMuted, fontSize: '13px' }}>Institution:</span>
-        <span style={{ fontWeight: '600' }}>University of Toronto</span>
+        <span style={{ fontWeight: '600' }}>University of California</span>
       </div>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -1199,7 +1199,7 @@ function ResearchCompanion() {
           <div style={{ fontSize: '12px', color: colors.textMuted, marginBottom: '12px', fontWeight: '600' }}>
             DATABASES
           </div>
-          {['JSTOR', 'PubMed', 'IEEE Xplore', 'Google Scholar', 'Scopus'].map((db, idx) => (
+          {['JSTOR', 'PubMed', 'IEEE Xplore', 'UC Press', 'PLOS', 'Nature'].map((db, idx) => (
             <label key={idx} style={{
               display: 'flex',
               alignItems: 'center',
