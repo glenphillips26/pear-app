@@ -145,7 +145,7 @@ function NavigationSidebar({ currentView, setCurrentView, collapsed, setCollapse
     }}>
       {/* Logo */}
       <div style={{
-        padding: '20px',
+        padding: '10px',
         borderBottom: `1px solid ${colors.border}`,
         display: 'flex',
         alignItems: 'center',
@@ -155,8 +155,8 @@ function NavigationSidebar({ currentView, setCurrentView, collapsed, setCollapse
   src="/pear-logo.png"
   alt="PEAR Logo"
   style={{
-    width: '50px',
-    height: '50px',
+    width: '80px',
+    height: '80px',
     objectFit: 'contain',
     flexShrink: 0,
   }}
